@@ -1,0 +1,11 @@
+langchain
+langchain-google-genai
+requests
+dataclasses
+dotenv
+langchain_community
+langchain-ollama
+
+# docs.py dependencies
+beautifulsoup4
+tiktoken

@@ -5,6 +5,7 @@ dataclasses
 dotenv
 langchain_community
 langchain-ollama
+langchain[openai]
 
 # docs.py dependencies
 beautifulsoup4

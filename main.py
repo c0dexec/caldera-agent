@@ -11,6 +11,8 @@ from dotenv import load_dotenv
 import os
 import datetime
 import tools
+# OpenAI imports
+from langchain_openai import ChatOpenAI
 
 
 # Load environment variables
@@ -32,12 +34,14 @@ If you are having error make use of "tools.api_call" to make the API calls.
 llm = ChatOllama(
     model="llama3.1:70b-instruct-q4_K_M",
     temperature=0,
-    max_tokens=1000,
+    max_tokens=4000,
     timeout=None,
     # state_schema=CustomAgentState,  
     checkpointer=InMemorySaver(),
     base_url="http://10.0.0.10:11434"  # Replace with your Ollama server URL
 )
+
+# llm = ChatOpenAI(model="gpt-4o-mini", temperature=0, max_tokens=16384,)
 
 requests_wrapper = RequestsWrapper(headers={"KEY": f"{os.getenv('CALDERA_API_TOKEN')}"})
 ALLOW_DANGEROUS_REQUEST = True
@@ -46,16 +50,15 @@ caldera_agent = planner.create_openapi_agent(
     llm=llm,
     api_spec=load_caldera_spec(),
     system_prompt=SYSTEM_PROMPT,
-    verbose=True,
+    verbose=False,
     allow_dangerous_requests=ALLOW_DANGEROUS_REQUEST,
     requests_wrapper=requests_wrapper,
-    tools=[tools.api_call],
     # context_schema=Context,
 )
 
 
 # user_query = (
-#     "What does POST request for /api/v2/payloads require? "
+#     "What's the status of the caldera server?"
 # )
 # caldera_agent.invoke(user_query)
 

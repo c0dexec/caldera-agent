@@ -20,7 +20,7 @@ def api_call(runtime: ToolRuntime, api_path: str, req_type: str, params: dict, p
     full_url = f"{url}/{api_path}"
     auth = {"KEY": f"{os.getenv('CALDERA_API_TOKEN')}"}
 
-    payload = {'file': open('{payload}', 'rb')} if payload else None
+    payload = {'file': open(f"{payload}", "rb")} if payload else None
 
     body = runtime.state["body"]
 

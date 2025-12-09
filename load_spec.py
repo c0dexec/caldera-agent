@@ -4,6 +4,7 @@ import requests
 from dotenv import load_dotenv
 from langchain_community.agent_toolkits.openapi.spec import reduce_openapi_spec
 
+
 def load_caldera_spec():
     # Reading URL
 

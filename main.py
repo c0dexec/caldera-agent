@@ -14,6 +14,10 @@ import tools
 # OpenAI imports
 from langchain_openai import ChatOpenAI
 
+import logging
+
+logging.basicConfig(level=logging.DEBUG)
+
 
 # Load environment variables
 load_dotenv()
@@ -50,9 +54,10 @@ caldera_agent = planner.create_openapi_agent(
     llm=llm,
     api_spec=load_caldera_spec(),
     system_prompt=SYSTEM_PROMPT,
-    verbose=False,
+    verbose=True,
     allow_dangerous_requests=ALLOW_DANGEROUS_REQUEST,
     requests_wrapper=requests_wrapper,
+    allowed_operations=["get", "post", "put", "delete", "patch", "head"],
     # context_schema=Context,
 )
 
@@ -78,6 +83,7 @@ def chat_loop():
         response = caldera_agent.invoke(
             {"input": user_query}, 
             config=config,
+            tools=[tools.api_call]
         )
         print(f"Caldera Agent({llm.model}): {response['structured_response'].caldera_output}\nCommand exectued: `{response['structured_response'].caldera_command}`\nUser: ", end="")
 

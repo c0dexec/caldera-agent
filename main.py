@@ -1,7 +1,7 @@
 # pip install -qU langchain "langchain[anthropic]"
 from langchain.agents import create_agent, AgentState
 from langgraph.checkpoint.memory import InMemorySaver
-# from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_ollama import ChatOllama
 from load_spec import load_caldera_spec
 from langchain_community.agent_toolkits.openapi import planner
@@ -34,11 +34,19 @@ Do exactly what the user asks you to do nothing else. If subsequent API calls ar
 
 If you are having error make use of "tools.api_call" to make the API calls.
 """
+from langchain_core.rate_limiters import InMemoryRateLimiter
 
-llm = ChatOllama(
+rate_limiter = InMemoryRateLimiter(
+    requests_per_second=0.01,  # 1 request every 60s
+    check_every_n_seconds=0.1,  # Check every 100ms whether allowed to make a request
+    max_bucket_size=10,  # Controls the maximum burst size.
+)
+
+llm = ChatGoogleGenerativeAI(
     model="llama3.1:70b-instruct-q4_K_M",
     temperature=0,
     max_tokens=4000,
+    rate_limiter=rate_limiter,
     timeout=None,
     # state_schema=CustomAgentState,  
     checkpointer=InMemorySaver(),
@@ -50,7 +58,9 @@ llm = ChatOllama(
 requests_wrapper = RequestsWrapper(headers={"KEY": f"{os.getenv('CALDERA_API_TOKEN')}"})
 ALLOW_DANGEROUS_REQUEST = True
 
-caldera_agent = planner.create_openapi_agent(
+from oapi_agent import create_openapi_agent
+
+caldera_agent = create_openapi_agent(
     llm=llm,
     api_spec=load_caldera_spec(),
     system_prompt=SYSTEM_PROMPT,

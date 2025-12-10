@@ -2,7 +2,8 @@ from dataclasses import dataclass
 from langchain.tools import tool, ToolRuntime
 import requests
 
-@tool
+# @tool
+## Add tool description.
 def api_call(runtime: ToolRuntime, api_path: str, req_type: str, params: dict, payload: str, body: dict) -> str:
     """Make an API call to a specified endpoint. Depending on the req_type, it might include a payload or body which is json text.
 

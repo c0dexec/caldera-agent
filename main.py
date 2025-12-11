@@ -1,7 +1,7 @@
 # pip install -qU langchain "langchain[anthropic]"
 from langchain.agents import create_agent, AgentState
 from langgraph.checkpoint.memory import InMemorySaver
-# from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_ollama import ChatOllama
 from load_spec import load_caldera_spec
 from langchain_community.agent_toolkits.openapi import planner
@@ -35,14 +35,22 @@ Do exactly what the user asks you to do nothing else. If subsequent API calls ar
 If you are having error make use of "tools.api_call" to make the API calls.
 """
 
-llm = ChatOllama(
-    model="llama3.1:70b-instruct-q4_K_M",
+from langchain_core.rate_limiters import InMemoryRateLimiter
+
+rate_limiter = InMemoryRateLimiter(
+    requests_per_second=0.01,  # 1 request every 60s
+    check_every_n_seconds=0.1,  # Check every 100ms whether allowed to make a request
+    max_bucket_size=10,  # Controls the maximum burst size.
+)
+
+llm = ChatGoogleGenerativeAI(
+    model="gemini-2.5-flash-lite",
     temperature=0,
-    max_tokens=4000,
+    max_tokens=65536,
     timeout=None,
     # state_schema=CustomAgentState,  
     checkpointer=InMemorySaver(),
-    base_url="http://10.0.0.10:11434"  # Replace with your Ollama server URL
+    # base_url="http://10.0.0.10:11434",  # Replace with your Ollama server URL
 )
 
 # llm = ChatOpenAI(model="gpt-4o-mini", temperature=0, max_tokens=16384,)
@@ -57,7 +65,7 @@ caldera_agent = planner.create_openapi_agent(
     verbose=True,
     allow_dangerous_requests=ALLOW_DANGEROUS_REQUEST,
     requests_wrapper=requests_wrapper,
-    allowed_operations=["get", "post", "put", "delete", "patch", "head"],
+    allowed_operations=["GET", "POST", "PUT", "DELETE", "PATCH"],
     # context_schema=Context,
 )
 
@@ -80,19 +88,58 @@ def chat_loop():
     user_query = input("User: ")
 
     while user_query.lower() not in ["exit", "quit"]:
+        # Support multi-line markdown input
+        if user_query.strip().endswith("```"):
+            # Multi-line input mode
+            lines = [user_query]
+            print("(Enter markdown block, end with ``` on a new line)")
+            while True:
+                line = input()
+                lines.append(line)
+                if line.strip() == "```":
+                    break
+            user_query = "\n".join(lines)
+        
+        # Format user query with context markers for better AI understanding
+        formatted_query = f"""
+## User Request
+
+{user_query}
+
+---
+**Timestamp**: {current_time}
+**Session**: chat_loop
+"""
+        
         response = caldera_agent.invoke(
-            {"input": user_query}, 
+            {"input": formatted_query}, 
             config=config,
             tools=[tools.api_call]
         )
-        print(f"Caldera Agent({llm.model}): {response['structured_response'].caldera_output}\nCommand exectued: `{response['structured_response'].caldera_command}`\nUser: ", end="")
-
-        # Write to log file
-        with open("caldera_agent.log", "a") as log_file:
-            log_file.write(f"[{current_time}] User: {user_query}\n")
-            log_file.write(f"[{current_time}] Agent({llm.model}): \n```\n{response['structured_response'].caldera_output}\n```\n Command exectued: `{response['structured_response'].caldera_command}`\n\n")
         
-        user_query = input("")
+        # Extract and format agent output
+        agent_output = response.get('output') or response.get('structured_response')
+        
+        # Format response with markdown
+        formatted_response = f"""
+## Agent Response
+
+{agent_output}
+
+---
+**Model**: {llm.model} | **Timestamp**: {current_time}
+"""
+        
+        print(formatted_response)
+
+        # Write to log file with markdown formatting
+        with open("caldera_agent.log", "a") as log_file:
+            log_file.write(f"## Chat Entry - {current_time}\n\n")
+            log_file.write(f"### User Query\n```markdown\n{user_query}\n```\n\n")
+            log_file.write(f"### Agent Response\n```\n{agent_output}\n```\n\n")
+            log_file.write("---\n\n")
+        
+        user_query = input("\nUser: ")
     else:
         print("Exiting chat loop.")
         with open("caldera_agent.log", "a") as log_file:

@@ -1,0 +1,4867 @@
+openapi: 3.0.1
+info:
+  title: Caldera
+  version: 5.2.0
+servers:
+- url: http://12.1.0.15:8888/
+paths:
+  /api/v2/health:
+    get:
+      tags:
+      - health
+      summary: Health endpoints returns the status of Caldera
+      description: Returns the status of Caldera and additional details including
+        versions of system components
+      responses:
+        "200":
+          description: Includes all loaded plugins and system components.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CalderaInfo'
+    head:
+      tags:
+      - health
+      summary: Health endpoints returns the status of Caldera
+      description: Returns the status of Caldera and additional details including
+        versions of system components
+      responses:
+        "200":
+          description: Includes all loaded plugins and system components.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CalderaInfo'
+  /api/v2/config/{name}:
+    get:
+      tags:
+      - config
+      summary: Retrieve Config
+      description: "Retrieves configuration by name, as specified by {name} in the\
+        \ request url."
+      parameters:
+      - name: name
+        in: path
+        description: Name of the configuration file to be retrieved.
+        required: true
+        schema: {}
+    head:
+      tags:
+      - config
+      summary: Retrieve Config
+      description: "Retrieves configuration by name, as specified by {name} in the\
+        \ request url."
+      parameters:
+      - name: name
+        in: path
+        description: Name of the configuration file to be retrieved.
+        required: true
+        schema: {}
+  /api/v2/config/main:
+    patch:
+      tags:
+      - config
+      summary: Update Main Config
+      description: Use fields from the ConfigUpdateSchema in the request body to update
+        the main configuration file.
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/ConfigUpdate'
+        required: false
+      x-codegen-request-body-name: body
+  /api/v2/config/agents:
+    patch:
+      tags:
+      - config
+      summary: Update Agent Config
+      description: Use fields from the AgentConfigUpdateSchema in the request body
+        to update the Agent Configuration file.
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/AgentConfigUpdate'
+        required: false
+      responses:
+        "200":
+          description: The response consists of data from the Agent configuration
+            file dumped in the AgentConfigUpdateSchema format.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AgentConfigUpdate'
+      x-codegen-request-body-name: body
+  /api/v2/planners:
+    get:
+      tags:
+      - planners
+      summary: Retrieve planners
+      description: Retrieve Caldera planners by criteria. Supply fields from the `PlannerSchema`
+        to the `include` and `exclude` fields of the `BaseGetAllQuerySchema` in the
+        request body to filter retrieved planners.
+      parameters:
+      - name: sort
+        in: query
+        schema:
+          type: string
+      - name: include
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      - name: exclude
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "200":
+          description: Returns a list of matching planners in `PlannerSchema` format.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Partial-Planner'
+    head:
+      tags:
+      - planners
+      summary: Retrieve planners
+      description: Retrieve Caldera planners by criteria. Supply fields from the `PlannerSchema`
+        to the `include` and `exclude` fields of the `BaseGetAllQuerySchema` in the
+        request body to filter retrieved planners.
+      parameters:
+      - name: sort
+        in: query
+        schema:
+          type: string
+      - name: include
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      - name: exclude
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "200":
+          description: Returns a list of matching planners in `PlannerSchema` format.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Partial-Planner'
+  /api/v2/planners/{planner_id}:
+    get:
+      tags:
+      - planners
+      summary: Retrieve a planner by planner id
+      description: Retrieve one Caldera planner based on the planner id (String `UUID`).
+        Supply fields from the `PlannerSchema` to the `include` and `exclude` fields
+        of the `BaseGetOneQuerySchema` in the request body to filter retrieved planners.
+      parameters:
+      - name: planner_id
+        in: path
+        description: UUID of the Planner object to be retrieved.
+        required: true
+        schema: {}
+      - name: include
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      - name: exclude
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "200":
+          description: Returns a planner with the specified id in `PlannerSchema`
+            format.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Partial-Planner'
+    head:
+      tags:
+      - planners
+      summary: Retrieve a planner by planner id
+      description: Retrieve one Caldera planner based on the planner id (String `UUID`).
+        Supply fields from the `PlannerSchema` to the `include` and `exclude` fields
+        of the `BaseGetOneQuerySchema` in the request body to filter retrieved planners.
+      parameters:
+      - name: planner_id
+        in: path
+        description: UUID of the Planner object to be retrieved.
+        required: true
+        schema: {}
+      - name: include
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      - name: exclude
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "200":
+          description: Returns a planner with the specified id in `PlannerSchema`
+            format.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Partial-Planner'
+    patch:
+      tags:
+      - planners
+      summary: Updates an existing planner.
+      description: Updates a planner based on the `PlannerSchema` value provided in
+        the message body.
+      parameters:
+      - name: planner_id
+        in: path
+        description: UUID of the Planner to be updated
+        required: true
+        schema: {}
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/Partial-Planner'
+        required: false
+      responses:
+        "200":
+          description: JSON dictionary representation of the replaced Planner.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Partial-Planner'
+      x-codegen-request-body-name: body
+  /api/v2/abilities:
+    get:
+      tags:
+      - abilities
+      summary: Get all abilities.
+      description: Provides a list of all available abilities.
+      parameters:
+      - name: sort
+        in: query
+        schema:
+          type: string
+      - name: include
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      - name: exclude
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "200":
+          description: Returns a list of all abilities.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Partial-Ability'
+    post:
+      tags:
+      - abilities
+      summary: Creates a new ability.
+      description: "Creates a new ability based on the `AbilitySchema`. \"name\",\
+        \ \"tactic\", \"technique_name\", \"technique_id\" and \"executors\" are all\
+        \ required fields."
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/Ability'
+        required: false
+      responses:
+        "200":
+          description: JSON dictionary representation of the created Ability.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ability'
+      x-codegen-request-body-name: body
+    head:
+      tags:
+      - abilities
+      summary: Get all abilities.
+      description: Provides a list of all available abilities.
+      parameters:
+      - name: sort
+        in: query
+        schema:
+          type: string
+      - name: include
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      - name: exclude
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "200":
+          description: Returns a list of all abilities.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Partial-Ability'
+  /api/v2/abilities/{ability_id}:
+    get:
+      tags:
+      - abilities
+      summary: Get an ability.
+      description: Provides one ability based on its ability id.
+      parameters:
+      - name: ability_id
+        in: path
+        description: UUID of the Ability to be retrieved
+        required: true
+        schema: {}
+      - name: include
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      - name: exclude
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "200":
+          description: JSON dictionary representation of the existing Ability.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Partial-Ability'
+    put:
+      tags:
+      - abilities
+      summary: Replaces an existing ability.
+      description: "Replaces an ability based on the `AbilitySchema` values provided\
+        \ in the message body. \"name\", \"tactic\", and \"executors\" are all required\
+        \ fields."
+      parameters:
+      - name: ability_id
+        in: path
+        description: UUID of the Ability to be retrieved
+        required: true
+        schema: {}
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/Partial-Ability'
+        required: false
+      responses:
+        "200":
+          description: JSON dictionary representation of the replaced Ability.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ability'
+      x-codegen-request-body-name: body
+    delete:
+      tags:
+      - abilities
+      summary: Deletes an ability.
+      description: Deletes an existing ability.
+      parameters:
+      - name: ability_id
+        in: path
+        description: UUID of the Ability to be retrieved
+        required: true
+        schema: {}
+      responses:
+        "204":
+          description: HTTP 204 Status Code (No Content)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ability'
+    head:
+      tags:
+      - abilities
+      summary: Get an ability.
+      description: Provides one ability based on its ability id.
+      parameters:
+      - name: ability_id
+        in: path
+        description: UUID of the Ability to be retrieved
+        required: true
+        schema: {}
+      - name: include
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      - name: exclude
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "200":
+          description: JSON dictionary representation of the existing Ability.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Partial-Ability'
+    patch:
+      tags:
+      - abilities
+      summary: Updates an existing ability.
+      description: Updates an ability based on the `AbilitySchema` values provided
+        in the message body.
+      parameters:
+      - name: ability_id
+        in: path
+        description: UUID of the Ability to be retrieved
+        required: true
+        schema: {}
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/Partial-Ability1'
+        required: false
+      responses:
+        "200":
+          description: JSON dictionary representation of the replaced Ability.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ability'
+      x-codegen-request-body-name: body
+  /api/v2/plugins:
+    get:
+      tags:
+      - plugins
+      summary: Retrieve all plugins
+      description: "Returns a list of all available plugins in the system, including\
+        \ directory, description,and active status. Supply fields from the `PluginSchema`\
+        \ to the include and exclude fields of the `BaseGetAllQuerySchema` in the\
+        \ request body to filter retrieved plugins."
+      parameters:
+      - name: sort
+        in: query
+        schema:
+          type: string
+      - name: include
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      - name: exclude
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "200":
+          description: Returns a list in `PluginSchema` format of all available plugins
+            in the system.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Partial-Plugin'
+    head:
+      tags:
+      - plugins
+      summary: Retrieve all plugins
+      description: "Returns a list of all available plugins in the system, including\
+        \ directory, description,and active status. Supply fields from the `PluginSchema`\
+        \ to the include and exclude fields of the `BaseGetAllQuerySchema` in the\
+        \ request body to filter retrieved plugins."
+      parameters:
+      - name: sort
+        in: query
+        schema:
+          type: string
+      - name: include
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      - name: exclude
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "200":
+          description: Returns a list in `PluginSchema` format of all available plugins
+            in the system.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Partial-Plugin'
+  /api/v2/plugins/{name}:
+    get:
+      tags:
+      - plugins
+      summary: Retrieve plugin by name
+      description: "If plugin was found with a matching name, an object containing\
+        \ information about the plugin is returned."
+      parameters:
+      - name: name
+        in: path
+        description: The name of the plugin
+        required: true
+        schema: {}
+      - name: include
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      - name: exclude
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "200":
+          description: "Returns a plugin in `PluginSchema` format with the requested\
+            \ name, if it exists."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Partial-Plugin'
+    head:
+      tags:
+      - plugins
+      summary: Retrieve plugin by name
+      description: "If plugin was found with a matching name, an object containing\
+        \ information about the plugin is returned."
+      parameters:
+      - name: name
+        in: path
+        description: The name of the plugin
+        required: true
+        schema: {}
+      - name: include
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      - name: exclude
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "200":
+          description: "Returns a plugin in `PluginSchema` format with the requested\
+            \ name, if it exists."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Partial-Plugin'
+  /api/v2/sources:
+    get:
+      tags:
+      - sources
+      summary: Retrieve all Fact Sources.
+      description: "Returns a list of all Fact Sources, including custom-created ones."
+      parameters:
+      - name: sort
+        in: query
+        schema:
+          type: string
+      - name: include
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      - name: exclude
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "200":
+          description: Returns a list of all Sources dumped in SourceSchema format.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Partial-Source'
+    post:
+      tags:
+      - sources
+      summary: Create a Fact Source.
+      description: Create a new Fact Source using the format provided in the SourceSchema.
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/Source'
+        required: false
+      responses:
+        "200":
+          description: Returns a single Source dumped in SourceSchema format.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Source'
+      x-codegen-request-body-name: body
+    head:
+      tags:
+      - sources
+      summary: Retrieve all Fact Sources.
+      description: "Returns a list of all Fact Sources, including custom-created ones."
+      parameters:
+      - name: sort
+        in: query
+        schema:
+          type: string
+      - name: include
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      - name: exclude
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "200":
+          description: Returns a list of all Sources dumped in SourceSchema format.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Partial-Source'
+  /api/v2/sources/{id}:
+    get:
+      tags:
+      - sources
+      summary: Retrieve a Fact Source by its id.
+      description: "Returns a Fact Source, given a source id."
+      parameters:
+      - name: id
+        in: path
+        description: The id of the Fact Source
+        required: true
+        schema: {}
+      - name: include
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      - name: exclude
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "200":
+          description: Returns a single Source dumped in SourceSchema format.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Partial-Source'
+    put:
+      tags:
+      - sources
+      summary: Update an existing or create a new Fact Source.
+      description: Use fields from the SourceSchema in the request body to replace
+        an existing Fact Source or create a new Fact Source.
+      parameters:
+      - name: id
+        in: path
+        description: The id of the Fact Source.
+        required: true
+        schema: {}
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/Partial-Source'
+        required: false
+      responses:
+        "200":
+          description: Returns a single Source dumped in SourceSchema format.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Source'
+      x-codegen-request-body-name: body
+    delete:
+      tags:
+      - sources
+      summary: Delete an existing Fact Source.
+      description: "Delete a Fact Source, given its id."
+      parameters:
+      - name: id
+        in: path
+        description: The id of the Fact Source to be deleted.
+        required: true
+        schema: {}
+      responses:
+        "200":
+          description: Returns DELETE status.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Source'
+    head:
+      tags:
+      - sources
+      summary: Retrieve a Fact Source by its id.
+      description: "Returns a Fact Source, given a source id."
+      parameters:
+      - name: id
+        in: path
+        description: The id of the Fact Source
+        required: true
+        schema: {}
+      - name: include
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      - name: exclude
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "200":
+          description: Returns a single Source dumped in SourceSchema format.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Partial-Source'
+    patch:
+      tags:
+      - sources
+      summary: Update an existing Fact Source.
+      description: "Returns an updated Fact Source. All fields in a Fact Source can\
+        \ be updated, except for \"id\" and \"adjustments\"."
+      parameters:
+      - name: id
+        in: path
+        description: The id of the Fact Source.
+        required: true
+        schema: {}
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/Partial-Source'
+        required: false
+      responses:
+        "200":
+          description: Returns a single Source dumped in SourceSchema format.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Source'
+      x-codegen-request-body-name: body
+  /api/v2/objectives:
+    get:
+      tags:
+      - objectives
+      summary: Retrieve objectives
+      description: Retrieve all objectives by criteria. Use fields from the `ObjectiveSchema`
+        in the request body to filter retrieved objectives.
+      parameters:
+      - name: sort
+        in: query
+        schema:
+          type: string
+      - name: include
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      - name: exclude
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "200":
+          description: A list of all objectives dumped in ObjectiveSchema format.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Partial-Objective'
+    post:
+      tags:
+      - objectives
+      summary: Create a new objective
+      description: Create a new objective using the format provided in the `ObjectiveSchema`.
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/Objective'
+        required: false
+      responses:
+        "200":
+          description: A single objective in ObjectiveSchema format.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Objective'
+      x-codegen-request-body-name: body
+    head:
+      tags:
+      - objectives
+      summary: Retrieve objectives
+      description: Retrieve all objectives by criteria. Use fields from the `ObjectiveSchema`
+        in the request body to filter retrieved objectives.
+      parameters:
+      - name: sort
+        in: query
+        schema:
+          type: string
+      - name: include
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      - name: exclude
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "200":
+          description: A list of all objectives dumped in ObjectiveSchema format.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Partial-Objective'
+  /api/v2/objectives/{id}:
+    get:
+      tags:
+      - objectives
+      summary: Retrieve objective by ID
+      description: Retrieve one objective by ID. Use fields from the `ObjectiveSchema`
+        in the request body to filter retrieved objective.
+      parameters:
+      - name: id
+        in: path
+        description: UUID of the objective to be retrieved
+        required: true
+        schema: {}
+      - name: include
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      - name: exclude
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "200":
+          description: Returns single objective in ObjectiveSchema format.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Partial-Objective'
+    put:
+      tags:
+      - objectives
+      summary: Create or update an objective
+      description: "Attempt to update an objective using fields from the `ObjectiveSchema`\
+        \ in the request body. If the objective does not already exist, then create\
+        \ a new one using the `ObjectiveSchema` format."
+      parameters:
+      - name: id
+        in: path
+        description: UUID of the Objective to be created or updated
+        required: true
+        schema: {}
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/Partial-Objective'
+        required: false
+      responses:
+        "200":
+          description: "A single Objective, either newly created or updated, in ObjectiveSchema\
+            \ format."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Objective'
+      x-codegen-request-body-name: body
+    head:
+      tags:
+      - objectives
+      summary: Retrieve objective by ID
+      description: Retrieve one objective by ID. Use fields from the `ObjectiveSchema`
+        in the request body to filter retrieved objective.
+      parameters:
+      - name: id
+        in: path
+        description: UUID of the objective to be retrieved
+        required: true
+        schema: {}
+      - name: include
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      - name: exclude
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "200":
+          description: Returns single objective in ObjectiveSchema format.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Partial-Objective'
+    patch:
+      tags:
+      - objectives
+      summary: Update an objective
+      description: Update an objective using fields from the `ObjectiveSchema` in
+        the request body.
+      parameters:
+      - name: id
+        in: path
+        description: UUID of the Objective to be updated
+        required: true
+        schema: {}
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/Partial-Objective1'
+        required: false
+      responses:
+        "200":
+          description: The updated Objective in ObjectiveSchema format.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Objective'
+      x-codegen-request-body-name: body
+  /api/v2/adversaries:
+    get:
+      tags:
+      - adversaries
+      summary: Retrieve all adversaries
+      description: "Returns a list of all available adversaries in the system, including\
+        \ plugin, name, description, and atomic ordering. Supply fields from the `AdversarySchema`\
+        \ to the include and exclude fields of the `BaseGetAllQuerySchema` in the\
+        \ request body to filter retrieved adversaries."
+      parameters:
+      - name: sort
+        in: query
+        schema:
+          type: string
+      - name: include
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      - name: exclude
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "200":
+          description: Returns a list in `AdversarySchema` format of all available
+            adversaries in the system.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Partial-Adversary'
+    post:
+      tags:
+      - adversaries
+      summary: Create a new adversary
+      description: Create a new adversary using the format provided in the `AdversarySchema`.
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/Adversary'
+        required: false
+      responses:
+        "200":
+          description: A single adversary in AdversarySchema format.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Adversary'
+      x-codegen-request-body-name: body
+    head:
+      tags:
+      - adversaries
+      summary: Retrieve all adversaries
+      description: "Returns a list of all available adversaries in the system, including\
+        \ plugin, name, description, and atomic ordering. Supply fields from the `AdversarySchema`\
+        \ to the include and exclude fields of the `BaseGetAllQuerySchema` in the\
+        \ request body to filter retrieved adversaries."
+      parameters:
+      - name: sort
+        in: query
+        schema:
+          type: string
+      - name: include
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      - name: exclude
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "200":
+          description: Returns a list in `AdversarySchema` format of all available
+            adversaries in the system.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Partial-Adversary'
+  /api/v2/adversaries/{adversary_id}:
+    get:
+      tags:
+      - adversaries
+      summary: Retrieve adversary by ID
+      description: Retrieve one adversary by ID. Use fields from the `AdversarySchema`
+        in the request body to filter retrieved adversary.
+      parameters:
+      - name: adversary_id
+        in: path
+        description: UUID of the adversary to be retrieved
+        required: true
+        schema: {}
+      - name: include
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      - name: exclude
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "200":
+          description: Returns single adversary in AdversarySchema format.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Partial-Adversary'
+    put:
+      tags:
+      - adversaries
+      summary: Create or update an adversary
+      description: "Attempt to update an adversaries using fields from the `AdversarySchema`\
+        \ in the request body. If the adversary does not already exist, then create\
+        \ a new one using the `AdversarySchema` format."
+      parameters:
+      - name: adversary_id
+        in: path
+        description: UUID of the adversary to be created or updated
+        required: true
+        schema: {}
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/Partial-Adversary'
+        required: false
+      responses:
+        "200":
+          description: "A single adversary, either newly created or updated, in AdversarySchema\
+            \ format."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Adversary'
+      x-codegen-request-body-name: body
+    delete:
+      tags:
+      - adversaries
+      summary: Deletes an adversary.
+      description: Deletes an existing adversary.
+      parameters:
+      - name: adversary_id
+        in: path
+        description: UUID of the adversary to be retrieved
+        required: true
+        schema: {}
+      responses:
+        "204":
+          description: HTTP 204 Status Code (No Content)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Partial-Adversary'
+    head:
+      tags:
+      - adversaries
+      summary: Retrieve adversary by ID
+      description: Retrieve one adversary by ID. Use fields from the `AdversarySchema`
+        in the request body to filter retrieved adversary.
+      parameters:
+      - name: adversary_id
+        in: path
+        description: UUID of the adversary to be retrieved
+        required: true
+        schema: {}
+      - name: include
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      - name: exclude
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "200":
+          description: Returns single adversary in AdversarySchema format.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Partial-Adversary'
+    patch:
+      tags:
+      - adversaries
+      summary: Update an adversary
+      description: Update an adversary using fields from the `AdversarySchema` in
+        the request body.
+      parameters:
+      - name: adversary_id
+        in: path
+        description: UUID of the adversary to be updated
+        required: true
+        schema: {}
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/Partial-Adversary1'
+        required: false
+      responses:
+        "200":
+          description: The updated adversary in AdversarySchema format.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Adversary'
+      x-codegen-request-body-name: body
+  /api/v2/agents:
+    get:
+      tags:
+      - agents
+      summary: Retrieves all agents
+      description: Retrieves all stored agents.
+      parameters:
+      - name: sort
+        in: query
+        schema:
+          type: string
+      - name: include
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      - name: exclude
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "200":
+          description: Returns a list of all agents.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Partial-Agent'
+    post:
+      tags:
+      - agents
+      summary: Create a new agent
+      description: Creates a new agent using the format from 'AgentSchema'.
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/Agent'
+        required: false
+      responses:
+        "200":
+          description: Returns a single agent in 'AgentSchema' format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Agent'
+      x-codegen-request-body-name: body
+    head:
+      tags:
+      - agents
+      summary: Retrieves all agents
+      description: Retrieves all stored agents.
+      parameters:
+      - name: sort
+        in: query
+        schema:
+          type: string
+      - name: include
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      - name: exclude
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "200":
+          description: Returns a list of all agents.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Partial-Agent'
+  /api/v2/agents/{paw}:
+    get:
+      tags:
+      - agents
+      summary: Retrieve Agent by paw
+      description: Retrieve information about a specific agent using its ID (paw).
+        Use the paw field in the URL to specify matching criteria for the agent to
+        obtain information about.
+      parameters:
+      - name: paw
+        in: path
+        description: ID of the Agent to retrieve information about
+        required: true
+        schema: {}
+      - name: include
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      - name: exclude
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "200":
+          description: Returns JSON response with specified Agent
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Partial-Agent'
+    put:
+      tags:
+      - agents
+      summary: Create or Update an Agent
+      description: "Update an agent, or if a existing agent match cannot be found,\
+        \ create one. Use the paw field in the URL to specify matching criteria and\
+        \ the fields from the AgentSchema in the request body to specify new field\
+        \ values."
+      parameters:
+      - name: paw
+        in: path
+        description: paw of the Agent to be retrieved
+        required: true
+        schema: {}
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/Partial-Agent'
+        required: false
+      responses:
+        "200":
+          description: Json dictionary representation of the created or updated Agent
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Agent'
+      x-codegen-request-body-name: body
+    delete:
+      tags:
+      - agents
+      summary: Delete an Agent
+      description: Delete an agent. Use the paw field in the URL to specify matching
+        criteria for the agent(s) to delete.
+      parameters:
+      - name: paw
+        in: path
+        description: paw of the Agent to be deleted
+        required: true
+        schema: {}
+      responses:
+        "200":
+          description: Returns HTTP 200
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Agent1'
+    head:
+      tags:
+      - agents
+      summary: Retrieve Agent by paw
+      description: Retrieve information about a specific agent using its ID (paw).
+        Use the paw field in the URL to specify matching criteria for the agent to
+        obtain information about.
+      parameters:
+      - name: paw
+        in: path
+        description: ID of the Agent to retrieve information about
+        required: true
+        schema: {}
+      - name: include
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      - name: exclude
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "200":
+          description: Returns JSON response with specified Agent
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Partial-Agent'
+    patch:
+      tags:
+      - agents
+      summary: Update an Agent
+      description: Update the attributes of a specific Agent using its ID (paw). Use
+        the paw field in the URL to specify matching criteria and the fields from
+        the AgentSchema in the request body to specify updated field values.
+      parameters:
+      - name: paw
+        in: path
+        description: ID of the Agent to update
+        required: true
+        schema: {}
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/Partial-Agent1'
+        required: false
+      responses:
+        "200":
+          description: Returns JSON response with updated Agent fields
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Agent'
+      x-codegen-request-body-name: body
+  /api/v2/deploy_commands:
+    get:
+      tags:
+      - agents
+      summary: Retrieve deploy commands
+      description: Retrieve the deploy commands currently configured within Caldera.
+      responses:
+        "200":
+          description: "Json dictionary representation of deploy commands, sorted\
+            \ by Ability ID"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeployCommands'
+    head:
+      tags:
+      - agents
+      summary: Retrieve deploy commands
+      description: Retrieve the deploy commands currently configured within Caldera.
+      responses:
+        "200":
+          description: "Json dictionary representation of deploy commands, sorted\
+            \ by Ability ID"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeployCommands'
+  /api/v2/deploy_commands/{ability_id}:
+    get:
+      tags:
+      - agents
+      summary: Retrieve deploy commands for an Ability
+      description: Retrieve the deploy commands associated with a given ability ID.
+        Use the 'ability_id' field in the URL specify which ability to retrieve deploy
+        commands for.
+      parameters:
+      - name: ability_id
+        in: path
+        description: ID of the ability to retrieve deploy commands for
+        required: true
+        schema: {}
+      responses:
+        "200":
+          description: Json dictionary representation of deploy commands for the specified
+            Ability ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeployCommands'
+    head:
+      tags:
+      - agents
+      summary: Retrieve deploy commands for an Ability
+      description: Retrieve the deploy commands associated with a given ability ID.
+        Use the 'ability_id' field in the URL specify which ability to retrieve deploy
+        commands for.
+      parameters:
+      - name: ability_id
+        in: path
+        description: ID of the ability to retrieve deploy commands for
+        required: true
+        schema: {}
+      responses:
+        "200":
+          description: Json dictionary representation of deploy commands for the specified
+            Ability ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeployCommands'
+  /api/v2/schedules:
+    get:
+      tags:
+      - schedules
+      summary: Retrieve Schedules
+      description: Returns all stored schedules.
+      parameters:
+      - name: sort
+        in: query
+        schema:
+          type: string
+      - name: include
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      - name: exclude
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "200":
+          description: The response is a list of all scheduled operations.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Partial-Schedule'
+    post:
+      tags:
+      - schedules
+      summary: Create Schedule
+      description: Use fields from the ScheduleSchema in the request body to create
+        a new Schedule.
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/Schedule'
+        required: false
+      responses:
+        "200":
+          description: The response is a dump of the newly created Schedule object.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Schedule'
+      x-codegen-request-body-name: body
+    head:
+      tags:
+      - schedules
+      summary: Retrieve Schedules
+      description: Returns all stored schedules.
+      parameters:
+      - name: sort
+        in: query
+        schema:
+          type: string
+      - name: include
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      - name: exclude
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "200":
+          description: The response is a list of all scheduled operations.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Partial-Schedule'
+  /api/v2/schedules/{id}:
+    get:
+      tags:
+      - schedules
+      summary: Retrieve Schedule
+      description: "Retrieves Schedule by UUID, as specified by {id} in the request\
+        \ url."
+      parameters:
+      - name: id
+        in: path
+        description: UUID of the Schedule to be retrieved.
+        required: true
+        schema: {}
+      - name: include
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      - name: exclude
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "200":
+          description: The response is a single dumped Scheduled object.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Partial-Schedule'
+    put:
+      tags:
+      - schedules
+      summary: Replace Schedule
+      description: Use fields from the ScheduleSchema in the request body to replace
+        an existing Schedule or create a new Schedule.
+      parameters:
+      - name: id
+        in: path
+        description: UUID of the Schedule to be retrieved.
+        required: true
+        schema: {}
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/Partial-Schedule2'
+        required: false
+      responses:
+        "200":
+          description: The response is a dump of the newly replaced Schedule object.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Schedule'
+      x-codegen-request-body-name: body
+    delete:
+      tags:
+      - schedules
+      summary: Delete Schedule
+      description: Deletes a Schedule object from the data service.
+      parameters:
+      - name: id
+        in: path
+        description: UUID of the Schedule to be retrieved.
+        required: true
+        schema: {}
+      responses:
+        "200":
+          description: Returns HTTP 204 No Content status code if Schedule is deleted
+            successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Schedule'
+    head:
+      tags:
+      - schedules
+      summary: Retrieve Schedule
+      description: "Retrieves Schedule by UUID, as specified by {id} in the request\
+        \ url."
+      parameters:
+      - name: id
+        in: path
+        description: UUID of the Schedule to be retrieved.
+        required: true
+        schema: {}
+      - name: include
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      - name: exclude
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "200":
+          description: The response is a single dumped Scheduled object.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Partial-Schedule'
+    patch:
+      tags:
+      - schedules
+      summary: Update Schedule
+      description: Use fields from the ScheduleSchema in the request body to update
+        an existing Schedule.
+      parameters:
+      - name: id
+        in: path
+        description: UUID of the Schedule to be retrieved.
+        required: true
+        schema: {}
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/Partial-Schedule1'
+        required: false
+      responses:
+        "200":
+          description: The response is a dump of the newly updated Schedule object.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Schedule'
+      x-codegen-request-body-name: body
+  /api/v2/operations:
+    get:
+      tags:
+      - operations
+      summary: Retrieve operations
+      description: Retrieve all Caldera operations from memory.  Use fields from the
+        `BaseGetAllQuerySchema` in the request body to filter.
+      parameters:
+      - name: sort
+        in: query
+        schema:
+          type: string
+      - name: include
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      - name: exclude
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "200":
+          description: The response is a list of all operations.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Partial-Operation'
+    post:
+      tags:
+      - operations
+      summary: Create a new Caldera operation record
+      description: "Create a new Caldera operation using the format provided in the\
+        \ `OperationSchema`. Required schema fields are as follows: \"name\", \"adversary.adversary_id\"\
+        , \"planner.id\", and \"source.id\""
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/Operation'
+        required: false
+      responses:
+        "200":
+          description: The response is the newly-created operation report.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Operation'
+      x-codegen-request-body-name: body
+    head:
+      tags:
+      - operations
+      summary: Retrieve operations
+      description: Retrieve all Caldera operations from memory.  Use fields from the
+        `BaseGetAllQuerySchema` in the request body to filter.
+      parameters:
+      - name: sort
+        in: query
+        schema:
+          type: string
+      - name: include
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      - name: exclude
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "200":
+          description: The response is a list of all operations.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Partial-Operation'
+  /api/v2/operations/summary:
+    get:
+      tags:
+      - operations
+      summary: Retrieve operations (alternate)
+      description: "Retrieve all Caldera operations from memory, with an alternate\
+        \ selection of properties. Use fields from the `BaseGetAllQuerySchema` in\
+        \ the request body to filter."
+      parameters:
+      - name: sort
+        in: query
+        schema:
+          type: string
+      - name: include
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      - name: exclude
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "200":
+          description: The response is a list of all operations.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Partial-OperationSchemaAlt'
+    head:
+      tags:
+      - operations
+      summary: Retrieve operations (alternate)
+      description: "Retrieve all Caldera operations from memory, with an alternate\
+        \ selection of properties. Use fields from the `BaseGetAllQuerySchema` in\
+        \ the request body to filter."
+      parameters:
+      - name: sort
+        in: query
+        schema:
+          type: string
+      - name: include
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      - name: exclude
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "200":
+          description: The response is a list of all operations.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Partial-OperationSchemaAlt'
+  /api/v2/operations/{id}:
+    get:
+      tags:
+      - operations
+      summary: Retrieve an operation by operation id
+      description: Retrieve one Caldera operation from memory based on the operation
+        id (String UUID).  Use fields from the `BaseGetOneQuerySchema` in the request
+        body to add `include` and `exclude` filters.
+      parameters:
+      - name: id
+        in: path
+        description: UUID of the Operation object to be retrieved.
+        required: true
+        schema: {}
+      - name: include
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      - name: exclude
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "200":
+          description: "The response is the operation with the specified id, if any."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Partial-Operation'
+    delete:
+      tags:
+      - operations
+      summary: Delete an operation by operation id
+      description: Delete one Caldera operation from memory based on the operation
+        id (String UUID).
+      parameters:
+      - name: id
+        in: path
+        description: UUID of the Operation object to be retrieved.
+        required: true
+        schema: {}
+      responses:
+        "200":
+          description: There is an empty response from a successful delete request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Operation'
+    head:
+      tags:
+      - operations
+      summary: Retrieve an operation by operation id
+      description: Retrieve one Caldera operation from memory based on the operation
+        id (String UUID).  Use fields from the `BaseGetOneQuerySchema` in the request
+        body to add `include` and `exclude` filters.
+      parameters:
+      - name: id
+        in: path
+        description: UUID of the Operation object to be retrieved.
+        required: true
+        schema: {}
+      - name: include
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      - name: exclude
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "200":
+          description: "The response is the operation with the specified id, if any."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Partial-Operation'
+    patch:
+      tags:
+      - operations
+      summary: Update fields within an operation
+      description: "Update one Caldera operation in memory based on the operation\
+        \ id (String UUID). The `state`, `autonomous` and `obfuscator` fields in the\
+        \ operation object may be edited in the request body using the `OperationSchema`."
+      parameters:
+      - name: id
+        in: path
+        description: UUID of the Operation object to be retrieved.
+        required: true
+        schema: {}
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/Partial-Operation1'
+        required: false
+      responses:
+        "200":
+          description: "The response is the updated operation, including user modifications."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Partial-Operation'
+      x-codegen-request-body-name: body
+  /api/v2/operations/{id}/report:
+    post:
+      tags:
+      - operations
+      summary: Get Operation Report
+      description: Retrieves the report for a given operation_id.
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema: {}
+      - name: include
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      - name: exclude
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/OperationOutputRequest'
+        required: false
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OperationOutputRequest'
+      x-codegen-request-body-name: body
+  /api/v2/operations/{id}/event-logs:
+    post:
+      tags:
+      - operations
+      summary: Get Operation Event Logs
+      description: Retrieves the event logs for a given operation_id.
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema: {}
+      - name: include
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      - name: exclude
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/OperationOutputRequest'
+        required: false
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OperationOutputRequest'
+      x-codegen-request-body-name: body
+  /api/v2/operations/{id}/links:
+    get:
+      tags:
+      - operations
+      summary: Get Links from Operation
+      description: Retrieves all links for a given operation_id.
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema: {}
+      - name: sort
+        in: query
+        schema:
+          type: string
+      - name: include
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      - name: exclude
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "200":
+          description: All links contained in operation with the given `id` (String
+            UUID).
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Partial-Link'
+    head:
+      tags:
+      - operations
+      summary: Get Links from Operation
+      description: Retrieves all links for a given operation_id.
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema: {}
+      - name: sort
+        in: query
+        schema:
+          type: string
+      - name: include
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      - name: exclude
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "200":
+          description: All links contained in operation with the given `id` (String
+            UUID).
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Partial-Link'
+  /api/v2/operations/{id}/links/{link_id}:
+    get:
+      tags:
+      - operations
+      summary: Retrieve a specified link from an operation
+      description: Retrieve the link with the provided `link_id` (String UUID) from
+        the operation with the given operation `id` (String UUID). Use fields from
+        the `BaseGetOneQuerySchema` in the request body to add `include` and `exclude`
+        filters.
+      parameters:
+      - name: id
+        in: path
+        description: String UUID of the Operation containing desired link.
+        required: true
+        schema: {}
+      - name: link_id
+        in: path
+        description: String UUID of the Link with the above operation.
+        required: true
+        schema: {}
+      - name: include
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      - name: exclude
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "200":
+          description: The link matching the provided `link_id` within the operation
+            matching `id`. Use fields from the `BaseGetOneQuerySchema` in the request
+            body to add `include` and `exclude` filters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Partial-Link'
+    head:
+      tags:
+      - operations
+      summary: Retrieve a specified link from an operation
+      description: Retrieve the link with the provided `link_id` (String UUID) from
+        the operation with the given operation `id` (String UUID). Use fields from
+        the `BaseGetOneQuerySchema` in the request body to add `include` and `exclude`
+        filters.
+      parameters:
+      - name: id
+        in: path
+        description: String UUID of the Operation containing desired link.
+        required: true
+        schema: {}
+      - name: link_id
+        in: path
+        description: String UUID of the Link with the above operation.
+        required: true
+        schema: {}
+      - name: include
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      - name: exclude
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "200":
+          description: The link matching the provided `link_id` within the operation
+            matching `id`. Use fields from the `BaseGetOneQuerySchema` in the request
+            body to add `include` and `exclude` filters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Partial-Link'
+    patch:
+      tags:
+      - operations
+      summary: Update the specified link within an operation
+      description: Update the `command` (String) or `status` (Integer) field within
+        the link with the provided  `link_id` (String UUID) from the operation with
+        the given operation `id` (String UUID).
+      parameters:
+      - name: id
+        in: path
+        description: String UUID of the Operation containing desired link.
+        required: true
+        schema: {}
+      - name: link_id
+        in: path
+        description: String UUID of the Link with the above operation.
+        required: true
+        schema: {}
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/Partial-Link1'
+        required: false
+      responses:
+        "200":
+          description: The updated link after a successful `PATCH` request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Link'
+      x-codegen-request-body-name: body
+  /api/v2/operations/{id}/links/{link_id}/result:
+    get:
+      tags:
+      - operations
+      summary: Retrieve the result of a link
+      description: Retrieve a dictionary containing a link and its results dictionary
+        based on the operation id (String UUID) and link id (String UUID).  Use fields
+        from the `BaseGetOneQuerySchema` in the request body to add `include` and
+        `exclude` filters.
+      parameters:
+      - name: id
+        in: path
+        description: UUID of the operation object to be retrieved.
+        required: true
+        schema: {}
+      - name: link_id
+        in: path
+        description: UUID of the link object to retrieve results of.
+        required: true
+        schema: {}
+      - name: include
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      - name: exclude
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "200":
+          description: Contains a dictionary with the requested link and its results
+            dictionary.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LinkResult'
+    head:
+      tags:
+      - operations
+      summary: Retrieve the result of a link
+      description: Retrieve a dictionary containing a link and its results dictionary
+        based on the operation id (String UUID) and link id (String UUID).  Use fields
+        from the `BaseGetOneQuerySchema` in the request body to add `include` and
+        `exclude` filters.
+      parameters:
+      - name: id
+        in: path
+        description: UUID of the operation object to be retrieved.
+        required: true
+        schema: {}
+      - name: link_id
+        in: path
+        description: UUID of the link object to retrieve results of.
+        required: true
+        schema: {}
+      - name: include
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      - name: exclude
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "200":
+          description: Contains a dictionary with the requested link and its results
+            dictionary.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LinkResult'
+  /api/v2/operations/{id}/potential-links:
+    get:
+      tags:
+      - operations
+      summary: Retrieve potential links for an operation.
+      description: "Retrieve all potential links for an operation based on the operation\
+        \ id (String UUID).  Use fields from the `BaseGetAllQuerySchema` in the request\
+        \ body to add `include`, `exclude`, and `sort` filters."
+      parameters:
+      - name: id
+        in: path
+        description: UUID of the operation object to retrieve links for.
+        required: true
+        schema: {}
+      - name: sort
+        in: query
+        schema:
+          type: string
+      - name: include
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      - name: exclude
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "200":
+          description: Response contains a list of link objects for the requested
+            id.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Partial-Link'
+    post:
+      tags:
+      - operations
+      summary: Creates a potential Link
+      description: "Creates a potential link to be executed by an agent. Create a\
+        \ potential Link using the format provided in the `LinkSchema`. The request\
+        \ body requires `paw`, `executor`, and `ability`."
+      parameters:
+      - name: id
+        in: path
+        description: UUID of the operation object for the link to be created on.
+        required: true
+        schema: {}
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/Link'
+        required: false
+      responses:
+        "200":
+          description: Response contains the newly assigned Link object.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Link'
+      x-codegen-request-body-name: body
+    head:
+      tags:
+      - operations
+      summary: Retrieve potential links for an operation.
+      description: "Retrieve all potential links for an operation based on the operation\
+        \ id (String UUID).  Use fields from the `BaseGetAllQuerySchema` in the request\
+        \ body to add `include`, `exclude`, and `sort` filters."
+      parameters:
+      - name: id
+        in: path
+        description: UUID of the operation object to retrieve links for.
+        required: true
+        schema: {}
+      - name: sort
+        in: query
+        schema:
+          type: string
+      - name: include
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      - name: exclude
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "200":
+          description: Response contains a list of link objects for the requested
+            id.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Partial-Link'
+  /api/v2/operations/{id}/potential-links/{paw}:
+    get:
+      tags:
+      - operations
+      summary: Retrieve potential links for an operation filterd by agent paw (id)
+      description: "Retrieve all potential links for an operation-agent pair based\
+        \ on the operation id (String UUID) and the agent paw (id) (String).  Use\
+        \ fields from the `BaseGetAllQuerySchema` in the request body to add `include`,\
+        \ `exclude`, and `sort` filters."
+      parameters:
+      - name: id
+        in: path
+        description: String UUID of the Operation containing desired links.
+        required: true
+        schema: {}
+      - name: paw
+        in: path
+        description: Agent paw for the specified operation.
+        required: true
+        schema: {}
+      - name: include
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      - name: exclude
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "200":
+          description: All potential links for operation and the specified agent paw.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Partial-Link'
+    head:
+      tags:
+      - operations
+      summary: Retrieve potential links for an operation filterd by agent paw (id)
+      description: "Retrieve all potential links for an operation-agent pair based\
+        \ on the operation id (String UUID) and the agent paw (id) (String).  Use\
+        \ fields from the `BaseGetAllQuerySchema` in the request body to add `include`,\
+        \ `exclude`, and `sort` filters."
+      parameters:
+      - name: id
+        in: path
+        description: String UUID of the Operation containing desired links.
+        required: true
+        schema: {}
+      - name: paw
+        in: path
+        description: Agent paw for the specified operation.
+        required: true
+        schema: {}
+      - name: include
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      - name: exclude
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "200":
+          description: All potential links for operation and the specified agent paw.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Partial-Link'
+  /api/v2/obfuscators:
+    get:
+      tags:
+      - obfuscators
+      summary: Retrieve obfuscators
+      description: Retrieves all stored obfuscators.
+      parameters:
+      - name: sort
+        in: query
+        schema:
+          type: string
+      - name: include
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      - name: exclude
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "200":
+          description: Returns a list of all obfuscators in ObfuscatorSchema format.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Partial-Obfuscator'
+    head:
+      tags:
+      - obfuscators
+      summary: Retrieve obfuscators
+      description: Retrieves all stored obfuscators.
+      parameters:
+      - name: sort
+        in: query
+        schema:
+          type: string
+      - name: include
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      - name: exclude
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "200":
+          description: Returns a list of all obfuscators in ObfuscatorSchema format.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Partial-Obfuscator'
+  /api/v2/obfuscators/{name}:
+    get:
+      tags:
+      - obfuscators
+      summary: Retrieve an obfuscator by name
+      description: "Retrieve an obfuscator by name, as specified by {name} in the\
+        \ request url."
+      parameters:
+      - name: name
+        in: path
+        description: Name of the Obfuscator
+        required: true
+        schema: {}
+      - name: include
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      - name: exclude
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "200":
+          description: Returns the specified obfuscator in ObfuscatorSchema format.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Partial-Obfuscator'
+    head:
+      tags:
+      - obfuscators
+      summary: Retrieve an obfuscator by name
+      description: "Retrieve an obfuscator by name, as specified by {name} in the\
+        \ request url."
+      parameters:
+      - name: name
+        in: path
+        description: Name of the Obfuscator
+        required: true
+        schema: {}
+      - name: include
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      - name: exclude
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "200":
+          description: Returns the specified obfuscator in ObfuscatorSchema format.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Partial-Obfuscator'
+  /api/v2/facts:
+    get:
+      tags:
+      - facts
+      summary: Retrieve Facts
+      description: Retrieve facts by criteria. Use fields from the `FactSchema` in
+        the request body to filter retrieved facts.
+      parameters:
+      - name: sort
+        in: query
+        schema:
+          type: string
+      - name: include
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      - name: exclude
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "200":
+          description: "Returns a list of matching facts, dumped in `FactSchema` format."
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Partial-Fact'
+    post:
+      tags:
+      - facts
+      summary: Create a Fact
+      description: Create a new fact using the format provided in the `FactSchema`.
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/Fact'
+        required: false
+      responses:
+        "200":
+          description: "Returns the created fact, dumped in `FactSchema` format."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Fact'
+      x-codegen-request-body-name: body
+    delete:
+      tags:
+      - facts
+      summary: Delete One or More Facts
+      description: Delete facts using the format provided in the `FactSchema`. This
+        will delete all facts that match the criteria specified in the payload.
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/Partial-Fact'
+        required: false
+      responses:
+        "200":
+          description: "Returns the deleted fact(s), dumped in `FactSchema` format."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Fact'
+      x-codegen-request-body-name: body
+    head:
+      tags:
+      - facts
+      summary: Retrieve Facts
+      description: Retrieve facts by criteria. Use fields from the `FactSchema` in
+        the request body to filter retrieved facts.
+      parameters:
+      - name: sort
+        in: query
+        schema:
+          type: string
+      - name: include
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      - name: exclude
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "200":
+          description: "Returns a list of matching facts, dumped in `FactSchema` format."
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Partial-Fact'
+    patch:
+      tags:
+      - facts
+      summary: Update One or More Facts
+      description: Update existing facts using the format provided in the `FactSchema`.
+        This will update all facts that match the criteria specified in the payload.
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/Partial-FactUpdateRequest'
+        required: false
+      responses:
+        "200":
+          description: "Returns the updated fact(s), dumped in `FactSchema` format."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Fact'
+      x-codegen-request-body-name: body
+  /api/v2/relationships:
+    get:
+      tags:
+      - relationships
+      summary: Retrieve Relationships
+      description: Retrieve relationships by criteria. Use fields from the `RelationshipSchema`
+        in the request body to filter retrieved relationships.
+      parameters:
+      - name: sort
+        in: query
+        schema:
+          type: string
+      - name: include
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      - name: exclude
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "200":
+          description: "Returns a list of matching relationships, dumped in `RelationshipSchema`\
+            \ format."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Relationship'
+    post:
+      tags:
+      - relationships
+      summary: Create a Relationship
+      description: Create a new relationship using the format provided in the `RelationshipSchema`.
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/Relationship'
+        required: false
+      responses:
+        "200":
+          description: "Returns the created relationship, dumped in `RelationshipSchema`\
+            \ format."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Relationship'
+      x-codegen-request-body-name: body
+    delete:
+      tags:
+      - relationships
+      summary: Delete One or More Relationships
+      description: Delete relationships using the format provided in the RelationshipSchema.
+        This will delete all relationships that match the criteria specified in the
+        payload.
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/Partial-Relationship'
+        required: false
+      responses:
+        "200":
+          description: "Returns the deleted relationship(s), dumped in RelationshipSchema\
+            \ format."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Relationship'
+      x-codegen-request-body-name: body
+    head:
+      tags:
+      - relationships
+      summary: Retrieve Relationships
+      description: Retrieve relationships by criteria. Use fields from the `RelationshipSchema`
+        in the request body to filter retrieved relationships.
+      parameters:
+      - name: sort
+        in: query
+        schema:
+          type: string
+      - name: include
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      - name: exclude
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "200":
+          description: "Returns a list of matching relationships, dumped in `RelationshipSchema`\
+            \ format."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Relationship'
+    patch:
+      tags:
+      - relationships
+      summary: Update One or More Relationships
+      description: Update existing relationships using the format provided in the
+        `RelationshipSchema`. This will update all relationships that match the criteria
+        specified in the payload.
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/Partial-RelationshipUpdate'
+        required: false
+      responses:
+        "200":
+          description: "Returns the updated relationship(s), dumped in `RelationshipSchema`\
+            \ format."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Relationship'
+      x-codegen-request-body-name: body
+  /api/v2/facts/{operation_id}:
+    get:
+      tags:
+      - facts
+      summary: Retrieve Facts by operation id
+      description: Retrieves facts associated with an operation. Returned facts will
+        either be user-generated facts or learned facts.
+      parameters:
+      - name: sort
+        in: query
+        schema:
+          type: string
+      - name: include
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      - name: exclude
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      - name: operation_id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: "Returns a list of facts associated with operation_id, dumped\
+            \ in `FactSchema` format."
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Partial-Fact'
+    head:
+      tags:
+      - facts
+      summary: Retrieve Facts by operation id
+      description: Retrieves facts associated with an operation. Returned facts will
+        either be user-generated facts or learned facts.
+      parameters:
+      - name: sort
+        in: query
+        schema:
+          type: string
+      - name: include
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      - name: exclude
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      - name: operation_id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: "Returns a list of facts associated with operation_id, dumped\
+            \ in `FactSchema` format."
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Partial-Fact'
+  /api/v2/relationships/{operation_id}:
+    get:
+      tags:
+      - relationships
+      summary: Retrieve Relationships by operation id
+      description: Retrieve relationships associated with an operation. Returned relationships
+        will be either user-generated relationships or learned relationships.
+      parameters:
+      - name: sort
+        in: query
+        schema:
+          type: string
+      - name: include
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      - name: exclude
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      - name: operation_id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: "Returns a list of matching relationships, dumped in `RelationshipSchema`\
+            \ format."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Relationship'
+    head:
+      tags:
+      - relationships
+      summary: Retrieve Relationships by operation id
+      description: Retrieve relationships associated with an operation. Returned relationships
+        will be either user-generated relationships or learned relationships.
+      parameters:
+      - name: sort
+        in: query
+        schema:
+          type: string
+      - name: include
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      - name: exclude
+        in: query
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      - name: operation_id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: "Returns a list of matching relationships, dumped in `RelationshipSchema`\
+            \ format."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Relationship'
+  /api/v2/contacts/{name}:
+    get:
+      tags:
+      - contacts
+      summary: Retrieve a List of Beacons made by Agents to the specified Contact
+      description: "Returns a list of beacons made by agents to the specified contact.\
+        \ The response is formatted as a list of dictionaries. The dictionaries have\
+        \ the keys `paw`, `instructions`, and `date`. `paw` being the paw of the agent\
+        \ that made the beacon. `instructions` being a list of strings (commands)\
+        \ executed by the agent since its last beacon. `date` being a UTC date/time\
+        \ string."
+      parameters:
+      - name: name
+        in: path
+        description: "Name of the contact to get beacons for, e.g. HTTP, TCP, et cetera."
+        required: true
+        schema: {}
+    head:
+      tags:
+      - contacts
+      summary: Retrieve a List of Beacons made by Agents to the specified Contact
+      description: "Returns a list of beacons made by agents to the specified contact.\
+        \ The response is formatted as a list of dictionaries. The dictionaries have\
+        \ the keys `paw`, `instructions`, and `date`. `paw` being the paw of the agent\
+        \ that made the beacon. `instructions` being a list of strings (commands)\
+        \ executed by the agent since its last beacon. `date` being a UTC date/time\
+        \ string."
+      parameters:
+      - name: name
+        in: path
+        description: "Name of the contact to get beacons for, e.g. HTTP, TCP, et cetera."
+        required: true
+        schema: {}
+  /api/v2/contacts:
+    get:
+      tags:
+      - contacts
+      summary: Retrieve a List of all available Contact reports
+      description: "Returns a list of contacts that at least one agent has beaconed\
+        \ to. As soon as any agent beacons over a given contact, the contact will\
+        \ be returned here."
+    head:
+      tags:
+      - contacts
+      summary: Retrieve a List of all available Contact reports
+      description: "Returns a list of contacts that at least one agent has beaconed\
+        \ to. As soon as any agent beacons over a given contact, the contact will\
+        \ be returned here."
+  /api/v2/payloads:
+    get:
+      tags:
+      - payloads
+      summary: Retrieve payloads
+      description: Retrieves all stored payloads.
+      parameters:
+      - name: sort
+        in: query
+        schema:
+          type: boolean
+          default: false
+      - name: exclude_plugins
+        in: query
+        schema:
+          type: boolean
+          default: false
+      - name: add_path
+        in: query
+        schema:
+          type: boolean
+          default: false
+      responses:
+        "200":
+          description: Returns a list of all payloads in PayloadSchema format.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payload'
+    post:
+      tags:
+      - payloads
+      summary: Create a payload
+      description: Uploads a payload.
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              required:
+              - file
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+        required: true
+      responses:
+        "200":
+          description: The created payload in a list in PayloadSchema format (with
+            name changed in case of a duplicate).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payload'
+    head:
+      tags:
+      - payloads
+      summary: Retrieve payloads
+      description: Retrieves all stored payloads.
+      parameters:
+      - name: sort
+        in: query
+        schema:
+          type: boolean
+          default: false
+      - name: exclude_plugins
+        in: query
+        schema:
+          type: boolean
+          default: false
+      - name: add_path
+        in: query
+        schema:
+          type: boolean
+          default: false
+      responses:
+        "200":
+          description: Returns a list of all payloads in PayloadSchema format.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payload'
+  /api/v2/payloads/{name}:
+    delete:
+      tags:
+      - payloads
+      summary: Delete a payload
+      description: Deletes a given payload.
+      parameters:
+      - name: name
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "204":
+          description: Payload has been properly deleted.
+          content: {}
+        "404":
+          description: Payload not found.
+          content: {}
+components:
+  schemas:
+    Plugin:
+      required:
+      - name
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        enabled:
+          type: boolean
+        address:
+          type: string
+    CalderaInfo:
+      type: object
+      properties:
+        application:
+          type: string
+        version:
+          type: string
+        access:
+          type: string
+        plugins:
+          type: array
+          items:
+            $ref: '#/components/schemas/Plugin'
+    ConfigUpdate:
+      required:
+      - prop
+      - value
+      type: object
+      properties:
+        prop:
+          type: string
+        value:
+          type: string
+    AgentConfigUpdate:
+      type: object
+      properties:
+        sleep_min:
+          type: integer
+        sleep_max:
+          type: integer
+        watchdog:
+          type: integer
+        untrusted_timer:
+          type: integer
+        implant_name:
+          type: string
+        bootstrap_abilities:
+          type: array
+          items:
+            type: string
+        deadman_abilities:
+          type: array
+          items:
+            type: string
+        deployments:
+          type: array
+          readOnly: true
+          items:
+            type: string
+    Fact:
+      required:
+      - trait
+      type: object
+      properties:
+        unique:
+          type: string
+          readOnly: true
+        trait:
+          type: string
+        name:
+          type: string
+          readOnly: true
+        value:
+          type: object
+          nullable: true
+        created:
+          pattern: "null"
+          type: string
+          format: "null"
+          readOnly: true
+        score:
+          type: integer
+        source:
+          type: string
+          nullable: true
+        origin_type:
+          type: object
+          nullable: true
+        links:
+          type: array
+          items:
+            type: string
+        relationships:
+          type: array
+          items:
+            type: string
+        limit_count:
+          type: integer
+        collected_by:
+          type: array
+          items:
+            type: string
+        technique_id:
+          type: string
+          nullable: true
+    Partial-Planner:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        module:
+          type: string
+        params:
+          type: object
+          additionalProperties:
+            type: object
+        description:
+          type: string
+        stopping_conditions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Fact'
+        ignore_enforcement_modules:
+          type: array
+          items:
+            type: string
+        allow_repeatable_abilities:
+          type: boolean
+        plugin:
+          type: string
+          nullable: true
+          default: "null"
+    ParserConfig:
+      type: object
+      properties:
+        source:
+          type: string
+        edge:
+          type: string
+          nullable: true
+          default: "null"
+        target:
+          type: string
+          nullable: true
+          default: "null"
+        custom_parser_vals:
+          type: object
+          additionalProperties:
+            type: string
+      additionalProperties: true
+    Parser:
+      type: object
+      properties:
+        module:
+          type: string
+        parserconfigs:
+          type: array
+          items:
+            $ref: '#/components/schemas/ParserConfig'
+    Variation:
+      type: object
+      properties:
+        description:
+          type: string
+        command:
+          type: string
+    Executor:
+      type: object
+      properties:
+        name:
+          type: string
+          nullable: true
+          default: "null"
+        platform:
+          type: string
+          nullable: true
+          default: "null"
+        command:
+          type: string
+          nullable: true
+          default: "null"
+        code:
+          type: string
+          nullable: true
+          default: "null"
+        language:
+          type: string
+          nullable: true
+          default: "null"
+        build_target:
+          type: string
+          nullable: true
+          default: "null"
+        payloads:
+          type: array
+          items:
+            type: string
+        uploads:
+          type: array
+          items:
+            type: string
+        timeout:
+          type: integer
+        parsers:
+          type: array
+          items:
+            $ref: '#/components/schemas/Parser'
+        cleanup:
+          type: array
+          items:
+            type: string
+        variations:
+          type: array
+          items:
+            $ref: '#/components/schemas/Variation'
+        additional_info:
+          type: object
+          additionalProperties:
+            type: string
+    Requirement:
+      type: object
+      properties:
+        module:
+          type: string
+        relationship_match:
+          type: array
+          items:
+            type: object
+            additionalProperties:
+              type: object
+    Access:
+      type: object
+      properties:
+        access:
+          type: object
+    Partial-Ability:
+      type: object
+      properties:
+        ability_id:
+          type: string
+        tactic:
+          type: string
+          nullable: true
+          default: "null"
+        technique_name:
+          type: string
+          nullable: true
+          default: "null"
+        technique_id:
+          type: string
+          nullable: true
+          default: "null"
+        name:
+          type: string
+          nullable: true
+          default: "null"
+        description:
+          type: string
+          nullable: true
+          default: "null"
+        executors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Executor'
+        requirements:
+          type: array
+          nullable: true
+          items:
+            $ref: '#/components/schemas/Requirement'
+        privilege:
+          type: string
+          nullable: true
+          default: "null"
+        repeatable:
+          type: boolean
+          nullable: true
+          default: false
+        buckets:
+          type: array
+          nullable: true
+          items:
+            type: string
+        additional_info:
+          type: object
+          additionalProperties:
+            type: string
+        access:
+          type: object
+          nullable: true
+          allOf:
+          - $ref: '#/components/schemas/Access'
+        singleton:
+          type: boolean
+          nullable: true
+          default: false
+        plugin:
+          type: string
+          nullable: true
+          default: "null"
+        delete_payload:
+          type: boolean
+          nullable: true
+          default: false
+    Ability:
+      type: object
+      properties:
+        ability_id:
+          type: string
+        tactic:
+          type: string
+          nullable: true
+          default: "null"
+        technique_name:
+          type: string
+          nullable: true
+          default: "null"
+        technique_id:
+          type: string
+          nullable: true
+          default: "null"
+        name:
+          type: string
+          nullable: true
+          default: "null"
+        description:
+          type: string
+          nullable: true
+          default: "null"
+        executors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Executor'
+        requirements:
+          type: array
+          nullable: true
+          items:
+            $ref: '#/components/schemas/Requirement'
+        privilege:
+          type: string
+          nullable: true
+          default: "null"
+        repeatable:
+          type: boolean
+          nullable: true
+          default: false
+        buckets:
+          type: array
+          nullable: true
+          items:
+            type: string
+        additional_info:
+          type: object
+          additionalProperties:
+            type: string
+        access:
+          type: object
+          nullable: true
+          allOf:
+          - $ref: '#/components/schemas/Access'
+        singleton:
+          type: boolean
+          nullable: true
+          default: false
+        plugin:
+          type: string
+          nullable: true
+          default: "null"
+        delete_payload:
+          type: boolean
+          nullable: true
+          default: false
+    Partial-Ability1:
+      type: object
+      properties:
+        tactic:
+          type: string
+          nullable: true
+          default: "null"
+        technique_name:
+          type: string
+          nullable: true
+          default: "null"
+        technique_id:
+          type: string
+          nullable: true
+          default: "null"
+        name:
+          type: string
+          nullable: true
+          default: "null"
+        description:
+          type: string
+          nullable: true
+          default: "null"
+        executors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Executor'
+        privilege:
+          type: string
+          nullable: true
+          default: "null"
+        repeatable:
+          type: boolean
+          nullable: true
+          default: false
+        buckets:
+          type: array
+          nullable: true
+          items:
+            type: string
+        singleton:
+          type: boolean
+          nullable: true
+          default: false
+        plugin:
+          type: string
+          nullable: true
+          default: "null"
+        delete_payload:
+          type: boolean
+          nullable: true
+          default: false
+    Partial-Plugin:
+      type: object
+      properties:
+        name:
+          type: string
+        enabled:
+          type: boolean
+        address:
+          type: string
+        description:
+          type: string
+        data_dir:
+          type: string
+        access:
+          type: integer
+    Rule:
+      required:
+      - action
+      - trait
+      type: object
+      properties:
+        action:
+          type: object
+        trait:
+          type: string
+        match:
+          type: string
+    Adjustment:
+      type: object
+      properties:
+        ability_id:
+          type: string
+        trait:
+          type: string
+        value:
+          type: string
+        offset:
+          type: integer
+    Relationship:
+      required:
+      - source
+      type: object
+      properties:
+        unique:
+          type: string
+          readOnly: true
+        source:
+          $ref: '#/components/schemas/Fact'
+        edge:
+          type: string
+          nullable: true
+        target:
+          $ref: '#/components/schemas/Fact'
+        score:
+          type: integer
+        origin:
+          type: string
+          nullable: true
+    Partial-Source:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        facts:
+          type: array
+          items:
+            $ref: '#/components/schemas/Fact'
+        rules:
+          type: array
+          items:
+            $ref: '#/components/schemas/Rule'
+        adjustments:
+          type: array
+          items:
+            $ref: '#/components/schemas/Adjustment'
+        relationships:
+          type: array
+          items:
+            $ref: '#/components/schemas/Relationship'
+        plugin:
+          type: string
+          nullable: true
+          default: "null"
+    Source:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        facts:
+          type: array
+          items:
+            $ref: '#/components/schemas/Fact'
+        rules:
+          type: array
+          items:
+            $ref: '#/components/schemas/Rule'
+        adjustments:
+          type: array
+          items:
+            $ref: '#/components/schemas/Adjustment'
+        relationships:
+          type: array
+          items:
+            $ref: '#/components/schemas/Relationship'
+        plugin:
+          type: string
+          nullable: true
+          default: "null"
+    Goal:
+      type: object
+      properties:
+        target:
+          type: string
+        value:
+          type: string
+        count:
+          type: integer
+        operator:
+          type: string
+        achieved:
+          type: boolean
+          readOnly: true
+    Partial-Objective:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        goals:
+          type: array
+          items:
+            $ref: '#/components/schemas/Goal'
+        percentage:
+          type: number
+          readOnly: true
+    Objective:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        goals:
+          type: array
+          items:
+            $ref: '#/components/schemas/Goal'
+        percentage:
+          type: number
+          readOnly: true
+    Partial-Objective1:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        goals:
+          type: array
+          items:
+            $ref: '#/components/schemas/Goal'
+    Partial-Adversary:
+      type: object
+      properties:
+        adversary_id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        atomic_ordering:
+          type: array
+          items:
+            type: string
+        objective:
+          type: string
+        tags:
+          type: array
+          nullable: true
+          items:
+            type: string
+        has_repeatable_abilities:
+          type: boolean
+          readOnly: true
+        plugin:
+          type: string
+          nullable: true
+          default: "null"
+    Adversary:
+      type: object
+      properties:
+        adversary_id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        atomic_ordering:
+          type: array
+          items:
+            type: string
+        objective:
+          type: string
+        tags:
+          type: array
+          nullable: true
+          items:
+            type: string
+        has_repeatable_abilities:
+          type: boolean
+          readOnly: true
+        plugin:
+          type: string
+          nullable: true
+          default: "null"
+    Partial-Adversary1:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        atomic_ordering:
+          type: array
+          items:
+            type: string
+        objective:
+          type: string
+        tags:
+          type: array
+          nullable: true
+          items:
+            type: string
+        has_repeatable_abilities:
+          type: boolean
+          readOnly: true
+        plugin:
+          type: string
+          nullable: true
+          default: "null"
+    Visibility:
+      type: object
+      properties:
+        score:
+          type: integer
+        adjustments:
+          type: array
+          items:
+            type: integer
+    Link:
+      type: object
+      properties:
+        id:
+          type: string
+          default: ""
+        paw:
+          type: string
+        command:
+          type: string
+        plaintext_command:
+          type: string
+        status:
+          type: integer
+        score:
+          type: integer
+        jitter:
+          type: integer
+        decide:
+          pattern: "null"
+          type: string
+          format: "null"
+        pin:
+          type: integer
+        pid:
+          type: string
+        facts:
+          type: array
+          items:
+            $ref: '#/components/schemas/Fact'
+        relationships:
+          type: array
+          items:
+            $ref: '#/components/schemas/Relationship'
+        used:
+          type: array
+          items:
+            $ref: '#/components/schemas/Fact'
+        unique:
+          type: string
+        collect:
+          pattern: "null"
+          type: string
+          format: "null"
+        finish:
+          type: string
+        ability:
+          $ref: '#/components/schemas/Ability'
+        executor:
+          $ref: '#/components/schemas/Executor'
+        cleanup:
+          type: integer
+        visibility:
+          $ref: '#/components/schemas/Visibility'
+        host:
+          type: string
+          nullable: true
+          default: "null"
+        output:
+          type: string
+        deadman:
+          type: boolean
+        agent_reported_time:
+          pattern: "null"
+          type: string
+          format: "null"
+          nullable: true
+          default: "null"
+    Partial-Agent:
+      type: object
+      properties:
+        paw:
+          type: string
+          nullable: true
+        sleep_min:
+          type: integer
+        sleep_max:
+          type: integer
+        watchdog:
+          type: integer
+        group:
+          type: string
+        architecture:
+          type: string
+        platform:
+          type: string
+        server:
+          type: string
+        upstream_dest:
+          type: string
+          nullable: true
+        username:
+          type: string
+        location:
+          type: string
+        pid:
+          type: integer
+        ppid:
+          type: integer
+        trusted:
+          type: boolean
+        executors:
+          type: array
+          items:
+            type: string
+        privilege:
+          type: string
+        exe_name:
+          type: string
+        host:
+          type: string
+        contact:
+          type: string
+        proxy_receivers:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+          nullable: true
+        proxy_chain:
+          type: array
+          nullable: true
+          items:
+            type: array
+            items:
+              type: string
+        origin_link_id:
+          type: string
+        deadman_enabled:
+          type: boolean
+          nullable: true
+        available_contacts:
+          type: array
+          nullable: true
+          items:
+            type: string
+        host_ip_addrs:
+          type: array
+          nullable: true
+          items:
+            type: string
+        display_name:
+          type: string
+          readOnly: true
+        created:
+          pattern: "null"
+          type: string
+          format: "null"
+          readOnly: true
+        last_seen:
+          pattern: "null"
+          type: string
+          format: "null"
+          readOnly: true
+        links:
+          type: array
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/Link'
+        pending_contact:
+          type: string
+    Agent:
+      type: object
+      properties:
+        paw:
+          type: string
+          nullable: true
+        sleep_min:
+          type: integer
+        sleep_max:
+          type: integer
+        watchdog:
+          type: integer
+        group:
+          type: string
+        architecture:
+          type: string
+        platform:
+          type: string
+        server:
+          type: string
+        upstream_dest:
+          type: string
+          nullable: true
+        username:
+          type: string
+        location:
+          type: string
+        pid:
+          type: integer
+        ppid:
+          type: integer
+        trusted:
+          type: boolean
+        executors:
+          type: array
+          items:
+            type: string
+        privilege:
+          type: string
+        exe_name:
+          type: string
+        host:
+          type: string
+        contact:
+          type: string
+        proxy_receivers:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+          nullable: true
+        proxy_chain:
+          type: array
+          nullable: true
+          items:
+            type: array
+            items:
+              type: string
+        origin_link_id:
+          type: string
+        deadman_enabled:
+          type: boolean
+          nullable: true
+        available_contacts:
+          type: array
+          nullable: true
+          items:
+            type: string
+        host_ip_addrs:
+          type: array
+          nullable: true
+          items:
+            type: string
+        display_name:
+          type: string
+          readOnly: true
+        created:
+          pattern: "null"
+          type: string
+          format: "null"
+          readOnly: true
+        last_seen:
+          pattern: "null"
+          type: string
+          format: "null"
+          readOnly: true
+        links:
+          type: array
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/Link'
+        pending_contact:
+          type: string
+    Partial-Agent1:
+      type: object
+      properties:
+        group:
+          type: string
+        trusted:
+          type: boolean
+        sleep_min:
+          type: integer
+        sleep_max:
+          type: integer
+        watchdog:
+          type: integer
+        pending_contact:
+          type: string
+    Agent1:
+      type: object
+    DeployCommands:
+      type: object
+      properties:
+        abilities:
+          type: array
+          items:
+            type: object
+            additionalProperties:
+              type: object
+        app_config:
+          type: object
+          additionalProperties:
+            type: object
+    Planner:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        module:
+          type: string
+        params:
+          type: object
+          additionalProperties:
+            type: object
+        description:
+          type: string
+        stopping_conditions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Fact'
+        ignore_enforcement_modules:
+          type: array
+          items:
+            type: string
+        allow_repeatable_abilities:
+          type: boolean
+        plugin:
+          type: string
+          nullable: true
+          default: "null"
+    Operation:
+      required:
+      - name
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        host_group:
+          type: array
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/Agent'
+        adversary:
+          $ref: '#/components/schemas/Adversary'
+        jitter:
+          type: string
+        planner:
+          $ref: '#/components/schemas/Planner'
+        start:
+          pattern: "null"
+          type: string
+          format: "null"
+          readOnly: true
+        state:
+          type: string
+        obfuscator:
+          type: string
+        autonomous:
+          type: integer
+        chain:
+          type: object
+          readOnly: true
+        auto_close:
+          type: boolean
+        visibility:
+          type: integer
+        objective:
+          $ref: '#/components/schemas/Objective'
+        use_learning_parsers:
+          type: boolean
+        group:
+          type: string
+          default: ""
+        source:
+          $ref: '#/components/schemas/Source'
+    Partial-Schedule:
+      type: object
+      properties:
+        id:
+          type: string
+        schedule:
+          type: string
+          example: 5 4 * * *
+        task:
+          $ref: '#/components/schemas/Operation'
+    Schedule:
+      required:
+      - schedule
+      type: object
+      properties:
+        id:
+          type: string
+        schedule:
+          type: string
+          example: 5 4 * * *
+        task:
+          $ref: '#/components/schemas/Operation'
+    Operation1:
+      type: object
+      properties:
+        state:
+          type: string
+        obfuscator:
+          type: string
+        autonomous:
+          type: integer
+    Partial-Schedule1:
+      type: object
+      properties:
+        schedule:
+          type: string
+          example: 5 4 * * *
+        task:
+          $ref: '#/components/schemas/Operation1'
+    Partial-Schedule2:
+      type: object
+      properties:
+        schedule:
+          type: string
+          example: 5 4 * * *
+        task:
+          $ref: '#/components/schemas/Operation'
+    Partial-Operation:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        host_group:
+          type: array
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/Agent'
+        adversary:
+          $ref: '#/components/schemas/Adversary'
+        jitter:
+          type: string
+        planner:
+          $ref: '#/components/schemas/Planner'
+        start:
+          pattern: "null"
+          type: string
+          format: "null"
+          readOnly: true
+        state:
+          type: string
+        obfuscator:
+          type: string
+        autonomous:
+          type: integer
+        chain:
+          type: object
+          readOnly: true
+        auto_close:
+          type: boolean
+        visibility:
+          type: integer
+        objective:
+          $ref: '#/components/schemas/Objective'
+        use_learning_parsers:
+          type: boolean
+        group:
+          type: string
+          default: ""
+        source:
+          $ref: '#/components/schemas/Source'
+    Host:
+      type: object
+      properties:
+        display_name:
+          type: string
+          readOnly: true
+        host:
+          type: string
+        host_ip_addrs:
+          type: array
+          nullable: true
+          items:
+            type: string
+        platform:
+          type: string
+        reachable_hosts:
+          type: array
+          nullable: true
+          items:
+            type: string
+    Partial-OperationSchemaAlt:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        host_group:
+          type: array
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/Agent'
+        adversary:
+          $ref: '#/components/schemas/Adversary'
+        jitter:
+          type: string
+        planner:
+          $ref: '#/components/schemas/Planner'
+        start:
+          pattern: "null"
+          type: string
+          format: "null"
+          readOnly: true
+        state:
+          type: string
+        obfuscator:
+          type: string
+        autonomous:
+          type: integer
+        chain:
+          type: object
+          readOnly: true
+        auto_close:
+          type: boolean
+        visibility:
+          type: integer
+        objective:
+          $ref: '#/components/schemas/Objective'
+        use_learning_parsers:
+          type: boolean
+        group:
+          type: string
+          default: ""
+        source:
+          $ref: '#/components/schemas/Source'
+        agents:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/Agent'
+        hosts:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/Host'
+    Partial-Operation1:
+      type: object
+      properties:
+        state:
+          type: string
+        autonomous:
+          type: integer
+        obfuscator:
+          type: string
+    OperationOutputRequest:
+      type: object
+      properties:
+        enable_agent_output:
+          type: boolean
+    Partial-Link:
+      type: object
+      properties:
+        id:
+          type: string
+          default: ""
+        paw:
+          type: string
+        command:
+          type: string
+        plaintext_command:
+          type: string
+        status:
+          type: integer
+        score:
+          type: integer
+        jitter:
+          type: integer
+        decide:
+          pattern: "null"
+          type: string
+          format: "null"
+        pin:
+          type: integer
+        pid:
+          type: string
+        facts:
+          type: array
+          items:
+            $ref: '#/components/schemas/Fact'
+        relationships:
+          type: array
+          items:
+            $ref: '#/components/schemas/Relationship'
+        used:
+          type: array
+          items:
+            $ref: '#/components/schemas/Fact'
+        unique:
+          type: string
+        collect:
+          pattern: "null"
+          type: string
+          format: "null"
+        finish:
+          type: string
+        ability:
+          $ref: '#/components/schemas/Ability'
+        executor:
+          $ref: '#/components/schemas/Executor'
+        cleanup:
+          type: integer
+        visibility:
+          $ref: '#/components/schemas/Visibility'
+        host:
+          type: string
+          nullable: true
+          default: "null"
+        output:
+          type: string
+        deadman:
+          type: boolean
+        agent_reported_time:
+          pattern: "null"
+          type: string
+          format: "null"
+          nullable: true
+          default: "null"
+    LinkResult:
+      type: object
+      properties:
+        link:
+          $ref: '#/components/schemas/Partial-Link'
+        result:
+          type: string
+    Partial-Link1:
+      type: object
+      properties:
+        command:
+          type: string
+        status:
+          type: integer
+    Partial-Obfuscator:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        module:
+          type: string
+    Partial-Fact:
+      type: object
+      properties:
+        unique:
+          type: string
+          readOnly: true
+        trait:
+          type: string
+        name:
+          type: string
+          readOnly: true
+        value:
+          type: object
+          nullable: true
+        created:
+          pattern: "null"
+          type: string
+          format: "null"
+          readOnly: true
+        score:
+          type: integer
+        source:
+          type: string
+          nullable: true
+        origin_type:
+          type: object
+          nullable: true
+        links:
+          type: array
+          items:
+            type: string
+        relationships:
+          type: array
+          items:
+            type: string
+        limit_count:
+          type: integer
+        collected_by:
+          type: array
+          items:
+            type: string
+        technique_id:
+          type: string
+          nullable: true
+    Partial-Relationship:
+      type: object
+      properties:
+        unique:
+          type: string
+          readOnly: true
+        source:
+          $ref: '#/components/schemas/Fact'
+        edge:
+          type: string
+          nullable: true
+        target:
+          $ref: '#/components/schemas/Fact'
+        score:
+          type: integer
+        origin:
+          type: string
+          nullable: true
+    Partial-FactUpdateRequest:
+      type: object
+      properties:
+        criteria:
+          $ref: '#/components/schemas/Partial-Fact'
+        updates:
+          $ref: '#/components/schemas/Partial-Fact'
+    Partial-RelationshipUpdate:
+      type: object
+      properties:
+        criteria:
+          $ref: '#/components/schemas/Partial-Relationship'
+        updates:
+          $ref: '#/components/schemas/Partial-Relationship'
+    Payload:
+      type: object
+      properties:
+        payloads:
+          type: array
+          items:
+            type: string
+x-original-swagger-version: "2.0"

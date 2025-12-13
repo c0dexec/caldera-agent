@@ -6,7 +6,13 @@ dotenv
 langchain_community
 langchain-ollama
 langchain[openai]
+langchain-text-splitters
 
 # docs.py dependencies
 beautifulsoup4
 tiktoken
+
+rich
+markdown
+langchain-community 
+faiss-cpu

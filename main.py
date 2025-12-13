@@ -2,37 +2,50 @@
 from langchain.agents import create_agent, AgentState
 from langgraph.checkpoint.memory import InMemorySaver
 from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain_ollama import ChatOllama
-from load_spec import load_caldera_spec
-from langchain_community.agent_toolkits.openapi import planner
 from langchain_community.utilities.requests import RequestsWrapper
 from langchain.agents import create_agent
 from dotenv import load_dotenv
 import os
 import datetime
-import tools
+from langchain.agents.structured_output import ProviderStrategy, ToolStrategy
+from tools import api_call, retrieve_context
 # OpenAI imports
-from langchain_openai import ChatOpenAI
+# from langchain_openai import ChatOpenAI
 
 import logging
+import readline
 
-logging.basicConfig(level=logging.DEBUG)
+# Python debugging logging
+# logging.basicConfig(level=logging.DEBUG)
 
 
 # Load environment variables
 load_dotenv()
 
 # Define system prompt
-SYSTEM_PROMPT = """
-Your are an AI agent designed to interact with the Caldera API.
-You will be provided with the OpenAPI specification for the Caldera API.
-Use this specification to understand the available endpoints and their functionalities.
+SYSTEM_PROMPT = f"""
+# About you
+Your are an AI agent designed to interact with the Caldera API. You will be provided with the OpenAPI specification for the Caldera API.
+
 When responding to user queries, ensure that you reference the OpenAPI spec to provide accurate and relevant information.
 Always prioritize safety and security when making API calls.
 
-Do exactly what the user asks you to do nothing else. If subsequent API calls are needed to fulfill the user's request, make them to finish the task.
+# Tools
+Tools available to you:
+1. api_call: Can be used to create API calls
+2. retrieve_context: Can be used to retrieve context about the Caldera API from the OpenAPI spec. This tool uses to retrieve data stored as JSON and Mardown to find relevant information.
 
-If you are having error make use of "tools.api_call" to make the API calls.
+# Actions
+When a user query is received, follow these steps:
+1. Access `retrieve_context` to gather relevant information from the OpenAPI spec.
+2. If a question was asked then respond directly using the retrieved context. If user requests an action to be performed using the Caldera API, proceed to step 3.
+3. Based on the retrieved context, determine the appropriate API endpoint and request type needed to fulfill the user's request.
+4. Once you are exactly sure about the endpoint and request type, then use the `tools.api_call` tool to make the API call. If you are getting HTTP Error code (4xx or 5xx) after 2 tries, then exit and inform the user about the failure.
+
+# Rules
+Do exactly what the user asks you to do nothing else. And limit your request to only one API call per user query for the same request type and endpoint.
+If subsequent API calls to different endpoints are needed to fulfill the user's request, let the user know about them.
+If you are every stuck in a loop, or unsure about what to do, respond with a message asking the user for clarification or more information.
 """
 
 from langchain_core.rate_limiters import InMemoryRateLimiter
@@ -48,9 +61,6 @@ llm = ChatGoogleGenerativeAI(
     temperature=0,
     max_tokens=65536,
     timeout=None,
-    # state_schema=CustomAgentState,  
-    checkpointer=InMemorySaver(),
-    # base_url="http://10.0.0.10:11434",  # Replace with your Ollama server URL
 )
 
 # llm = ChatOpenAI(model="gpt-4o-mini", temperature=0, max_tokens=16384,)
@@ -58,93 +68,217 @@ llm = ChatGoogleGenerativeAI(
 requests_wrapper = RequestsWrapper(headers={"KEY": f"{os.getenv('CALDERA_API_TOKEN')}"})
 ALLOW_DANGEROUS_REQUEST = True
 
-caldera_agent = planner.create_openapi_agent(
-    llm=llm,
-    api_spec=load_caldera_spec(),
-    system_prompt=SYSTEM_PROMPT,
-    verbose=True,
-    allow_dangerous_requests=ALLOW_DANGEROUS_REQUEST,
-    requests_wrapper=requests_wrapper,
-    allowed_operations=["GET", "POST", "PUT", "DELETE", "PATCH"],
-    # context_schema=Context,
-)
+api_response_schema = {
+    "type": "object",
+    "description": "Can represent either a natural language answer or a Caldera API response.",
+    "properties": {
+        "mode": {
+            "type": "string",
+            "description": "Defines whether this output is a normal text message or an API response.",
+            "enum": ["message", "api_response"]
+        },
 
+        # Natural-language response mode
+        "message": {
+            "type": ["string", "null"],
+            "description": "Direct answer to the user when mode=message."
+        },
+
+        # API response mode
+        "success": {
+            "type": ["boolean", "null"],
+            "description": "True if the API request succeeded, false otherwise. Null when mode=message."
+        },
+        "status_code": {
+            "type": ["integer", "null"],
+            "description": "HTTP status code returned by the Caldera API. Null when mode=message."
+        },
+        "endpoint": {
+            "type": ["string", "null"],
+            "description": "The API endpoint that was called. Null when mode=message."
+        },
+        "data": {
+            "description": "API response content. Null when mode=message.",
+            "oneOf": [
+                {"type": "object"},
+                {"type": "array"},
+                {"type": "string"},
+                {"type": "number"},
+                {"type": "boolean"},
+                {"type": "null"}
+            ]
+        },
+        "error": {
+            "type": ["object", "null"],
+            "description": "Error info if success=false. Null when mode=message.",
+            "properties": {
+                "message": {"type": "string"},
+                "details": {"type": "string"},
+                "type": {"type": "string"}
+            }
+        }
+    },
+
+    "required": ["mode"]
+}       
+
+caldera_agent = create_agent(
+    model=llm,
+    system_prompt=SYSTEM_PROMPT,
+    tools=[api_call, retrieve_context],
+    response_format=ToolStrategy(api_response_schema),
+    debug=False,
+)
 
 # user_query = (
 #     "What's the status of the caldera server?"
 # )
-# caldera_agent.invoke(user_query)
+# result = caldera_agent.invoke(
+#     {"messages": [{"role": "user", "content": f"{user_query}"}]},
+# )
+
+# result["structured_response"]
 
 
-# # Run the agent
-import datetime
+# # # Run the agent
+# import datetime
 
 def chat_loop():
-
     config = {"configurable": {"thread_id": "1"}}
-
-    current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
-    user_query = input("User: ")
-
-    while user_query.lower() not in ["exit", "quit"]:
-        # Support multi-line markdown input
-        if user_query.strip().endswith("```"):
-            # Multi-line input mode
-            lines = [user_query]
-            print("(Enter markdown block, end with ``` on a new line)")
-            while True:
-                line = input()
-                lines.append(line)
-                if line.strip() == "```":
+    
+    # Setup readline for history
+    history_file = os.path.expanduser("~/.caldera_agent_history")
+    if os.path.exists(history_file):
+        readline.read_history_file(history_file)
+    
+    readline.set_history_length(1000)
+    
+    print("\n" + "="*60)
+    print("🤖 Caldera Agent Chat Interface")
+    print("="*60)
+    print("Type 'exit' or 'quit' to end the session")
+    print("Type 'help' for available commands")
+    print("Use ↑↓ arrow keys to navigate command history")
+    print("="*60 + "\n")
+    
+    conversation_history = []
+    
+    try:
+        while True:
+            try:
+                user_input = input("You: ").strip()
+                
+                # Handle empty input
+                if not user_input:
+                    continue
+                
+                # Handle exit commands
+                if user_input.lower() in ["exit", "quit"]:
+                    print("\n👋 Thank you for using Caldera Agent. Goodbye!")
                     break
-            user_query = "\n".join(lines)
-        
-        # Format user query with context markers for better AI understanding
-        formatted_query = f"""
-## User Request
+                
+                # Handle help command
+                if user_input.lower() == "help":
+                    print("""
+Available commands:
+  help     - Show this help message
+  clear    - Clear conversation history
+  exit     - Exit the chat
+  quit     - Exit the chat
+                    """)
+                    continue
+                
+                # Handle clear command
+                if user_input.lower() == "clear":
+                    conversation_history = []
+                    print("✓ Conversation history cleared\n")
+                    continue
+                
+                print("\n⏳ Processing your request...\n")
+                
+                current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                
+                # Build context with conversation history
+                conversation_context = ""
+                if conversation_history:
+                    conversation_context = "Previous conversation:\n"
+                    for msg in conversation_history[-4:]:  # Keep last 4 exchanges
+                        conversation_context += f"- {msg}\n"
+                
+                formatted_query = f"""{conversation_context}
+Current request: {user_input}
+Timestamp: {current_time}"""
+                
+                try:
+                    response = caldera_agent.invoke(
+                        {"messages": [{"role": "user", "content": f"{formatted_query}"}]},
+                        # {"input": formatted_query}, 
+                        config=config,
+                        tools=[api_call, retrieve_context]
+                    )
+                    
+                    agent_output = response.get('output') or response.get('structured_response')
+                    
+                    # Store in history
+                    conversation_history.append(f"User: {user_input}")
+                    conversation_history.append(f"Agent: {agent_output}")
+                    
+                    # Display response with formatting
+                    print("Agent:")
+                    print("-" * 40)
+                    # print(agent_output)
+                    # from pprint import pprint
+                    # [pprint(f"{k}: {agent_output[k]}") for k in agent_output]
+                    from rich import print as rprint
+                    from rich.pretty import Pretty
 
-{user_query}
+                    # agent_output is your dictionary
+                    # rprint(Pretty(agent_output))
+                    # print(agent_output["message"])
+                    # print(type(agent_output))
+                    print(agent_output.keys())
+                    # print(agent_output)
 
----
-**Timestamp**: {current_time}
-**Session**: chat_loop
-"""
-        
-        response = caldera_agent.invoke(
-            {"input": formatted_query}, 
-            config=config,
-            tools=[tools.api_call]
-        )
-        
-        # Extract and format agent output
-        agent_output = response.get('output') or response.get('structured_response')
-        
-        # Format response with markdown
-        formatted_response = f"""
-## Agent Response
+                    for key, title in [
+                        ("mode", "Mode"),
+                        ("message", "Message"),
+                        ("status_code", "Status Code"),
+                        ("endpoint", "Endpoint"),
+                        ("data", "Data"),
+                        ("error", "Error"),
+                    ]:
+                        from rich.console import Console
+                        from rich.markdown import Markdown
+                        value = agent_output.get(key)
+                        if value is not None:
 
-{agent_output}
+                            console = Console()
+                            markdown = Markdown(f"### {title}:\n```\n{value}\n")
+                            console.print(markdown)
 
----
-**Model**: {llm.model} | **Timestamp**: {current_time}
-"""
-        
-        print(formatted_response)
 
-        # Write to log file with markdown formatting
-        with open("caldera_agent.log", "a") as log_file:
-            log_file.write(f"## Chat Entry - {current_time}\n\n")
-            log_file.write(f"### User Query\n```markdown\n{user_query}\n```\n\n")
-            log_file.write(f"### Agent Response\n```\n{agent_output}\n```\n\n")
-            log_file.write("---\n\n")
-        
-        user_query = input("\nUser: ")
-    else:
-        print("Exiting chat loop.")
-        with open("caldera_agent.log", "a") as log_file:
-            log_file.write(f"[{current_time}] User exited the chat loop.\n\n")
-        exit()
+                    # pprint(agent_output)
+                    print("-" * 40 + "\n")
+                    
+                    # Log to file
+                    with open("caldera_agent.log", "a") as log_file:
+                        log_file.write(f"[{current_time}] User: {user_input}\n")
+                        log_file.write(f"[{current_time}] Agent: {agent_output}\n\n")
+                
+                except Exception as e:
+                    print(f"❌ Error: {str(e)}\n")
+                    with open("caldera_agent.log", "a") as log_file:
+                        log_file.write(f"[{current_time}] ERROR: {str(e)}\n\n")
+            
+            except KeyboardInterrupt:
+                print("\n\n👋 Chat interrupted. Goodbye!")
+                break
+            except Exception as e:
+                print(f"❌ Unexpected error: {str(e)}\n")
+    
+    finally:
+        # Save history before exiting
+        readline.write_history_file(history_file)
 
 if __name__ == "__main__":
     chat_loop()

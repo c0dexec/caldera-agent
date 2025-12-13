@@ -1,17 +1,25 @@
 from dataclasses import dataclass
 from langchain.tools import tool, ToolRuntime
 import requests
+import os
+from urllib3.util import Retry
+from requests.adapters import HTTPAdapter
+from langchain.tools import tool
+from vectorstore import get_vector_store
+
 
 @tool
-def api_call(runtime: ToolRuntime, api_path: str, req_type: str, params: dict, payload: str, body: dict) -> str:
-    """Make an API call to a specified endpoint. Depending on the req_type, it might include a payload or body which is json text.
+def api_call(runtime: ToolRuntime, api_path: str, req_type: str, params: dict, file: str, body: dict) -> str:
+    """Make an API call to a specified endpoint. Depending on the req_type, it might include a file or body which is json text.
+
+    Always responds back with the response text using (response.text).
 
     Args:
         url: Base URL of the API
         api_path: Specific API path to call
         req_type: Type of HTTP request (GET, POST, PUT, DELETE, PATCH, HEAD)
         params: Query parameters for the API call
-        payload: File path for payload (if applicable)
+        file: File path for file (if applicable)
         body: JSON body for the API call (if applicable)
     """
     req_type = req_type.lower()
@@ -20,24 +28,48 @@ def api_call(runtime: ToolRuntime, api_path: str, req_type: str, params: dict, p
     full_url = f"{url}/{api_path}"
     auth = {"KEY": f"{os.getenv('CALDERA_API_TOKEN')}"}
 
-    payload = {'file': open(f"{payload}", "rb")} if payload else None
+    # Setup retries
+    retries = Retry(
+        total=0,                 # total retry attempts
+        backoff_factor=0.3,      # wait 0.3s, 0.6s, 1.2s, etc
+        status_forcelist=[502, 503, 504],
+        allowed_methods={"GET", "POST", "PUT", "DELETE", "PATCH", "HEAD"},
+        raise_on_status=True     # <-- this will raise a RetryError after max retries
+    )
+    
+    s = requests.Session()
+    adapter = HTTPAdapter(max_retries=retries)
+    s.mount("http://", adapter)
+    s.mount("https://", adapter)
 
-    body = runtime.state["body"]
+    file = {'file': open(f"{file}", "rb")} if file else None
 
-    if req_type == "get":
-        response = requests.get(full_url, params=params, headers=auth)
-    elif req_type == "post":
-        response = requests.post(full_url, files=payload, json=body, params=params, headers=auth)
-    elif req_type == "put":
-        response = requests.put(full_url, json=body, params=params, headers=auth)
-    elif req_type == "delete":
-        response = requests.delete(full_url, params=params, headers=auth)
-    elif req_type == "patch":
-        response = requests.patch(full_url, json=body, params=params, headers=auth)
-    elif req_type == "head":
-        response = requests.head(full_url, params=params, headers=auth)
-    else:
-        return f"Unsupported request type: {req_type}"
+    # print(f"This is the run time state: {runtime.state}")
+
+    body = runtime.state.get("body", {}) if not body else body
+
+    # Make request
+    try:
+        if req_type == "get":
+            response = s.get(full_url, params=params, headers=auth)
+        elif req_type == "post":
+            response = s.post(full_url, files=file, json=body, params=params, headers=auth)
+        elif req_type == "put":
+            response = s.put(full_url, json=body, params=params, headers=auth)
+        elif req_type == "delete":
+            response = s.delete(full_url, params=params, headers=auth)
+        elif req_type == "patch":
+            response = s.patch(full_url, json=body, params=params, headers=auth)
+        elif req_type == "head":
+            response = s.head(full_url, params=params, headers=auth)
+        else:
+            return f"Unsupported request type: {req_type}"
+    except requests.exceptions.RetryError:
+        # This happens after max retries
+        return f"API call failed after maximum retries ({retries.total})"
+    except requests.exceptions.RequestException as e:
+        # Catch other network errors
+        return f"API call failed due to network error: {e}"
     
     return response.text
 
@@ -45,6 +77,21 @@ def api_call(runtime: ToolRuntime, api_path: str, req_type: str, params: dict, p
 class Context:
     api_path: str
     body: dict
-    payload: str
+    file: str
     params: dict
     req_type: str
+
+
+@tool(response_format="content_and_artifact")
+def retrieve_context(query: str):
+    """Retrieve information to help answer a query."""
+    vector_store = get_vector_store()
+
+    retrieved_docs = vector_store.similarity_search(query, k=2)
+
+    serialized = "\n\n".join(
+        f"Source: {doc.metadata}\nContent: {doc.page_content}"
+        for doc in retrieved_docs
+    )
+
+    return serialized, retrieved_docs

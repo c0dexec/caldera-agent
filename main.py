@@ -4,6 +4,7 @@ from langgraph.checkpoint.memory import InMemorySaver
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_community.utilities.requests import RequestsWrapper
 from langchain.agents import create_agent
+from langchain.agents.middleware import SummarizationMiddleware
 from dotenv import load_dotenv
 import os
 import datetime
@@ -128,6 +129,13 @@ caldera_agent = create_agent(
     tools=[api_call, retrieve_context],
     response_format=ToolStrategy(api_response_schema),
     debug=False,
+    middleware=[
+        SummarizationMiddleware(
+            model=llm,
+            trigger=("tokens", 4000),
+            keep=("messages", 20),
+        ),
+    ],
 )
 
 # user_query = (

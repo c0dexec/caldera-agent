@@ -13,6 +13,7 @@
     - [x] RAG JSON parsing.
     - [x] RAG Markdown parsing.
 - [x] Implemented local embedding to reduce context windows. (https://docs.langchain.com/oss/python/integrations/vectorstores/faiss)
+    - [x] Added summarization of context within the agent.
 
 # Blockers/Limitations
 - Sometime endpoint isnt found right away, need to ask AI again.

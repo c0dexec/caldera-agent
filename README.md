@@ -1,5 +1,9 @@
 # About project
 - Create an AI agent that can perform user's tasks through the use of Caldera's API.
+
+## Pre-requisites
+- Before execution of `main.py` run `index_embedding.py` to initialize our local embedding store.
+
 ## Work plan
 - [x] Implement OpenAPI v2 ingestion and suppliment it as context.
 - [x] Implement payload uploading capabilities.

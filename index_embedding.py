@@ -20,7 +20,7 @@ json_splitter = RecursiveJsonSplitter(max_chunk_size=300)
 json_docs = json_splitter.create_documents([json_data])
 
 # -------- Load Markdown --------
-markdown_files = glob.glob("./docs/*.md")  # matches all Markdown files in current folder
+markdown_files = glob.glob("./source_docs/*.md")  # matches all Markdown files in current folder
 markdown_texts = []
 
 for file_path in markdown_files:

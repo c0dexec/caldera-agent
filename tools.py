@@ -6,7 +6,7 @@ from urllib3.util import Retry
 from requests.adapters import HTTPAdapter
 from langchain.tools import tool
 from vectorstore import get_vector_store
-
+from langgraph.prebuilt.tool_node import ToolNode
 
 @tool
 def api_call(runtime: ToolRuntime, api_path: str, req_type: str, params: dict, file: str, body: dict) -> str:
@@ -30,7 +30,7 @@ def api_call(runtime: ToolRuntime, api_path: str, req_type: str, params: dict, f
 
     # Setup retries
     retries = Retry(
-        total=0,                 # total retry attempts
+        total=1,                 # total retry attempts
         backoff_factor=0.3,      # wait 0.3s, 0.6s, 1.2s, etc
         status_forcelist=[502, 503, 504],
         allowed_methods={"GET", "POST", "PUT", "DELETE", "PATCH", "HEAD"},
@@ -72,6 +72,13 @@ def api_call(runtime: ToolRuntime, api_path: str, req_type: str, params: dict, f
         return f"API call failed due to network error: {e}"
     
     return response.text
+
+# Error handling and reporting for tool
+def handle_errors(e: ValueError) -> str:
+    return "Invalid input provided"
+
+tool_node = ToolNode([api_call], handle_tool_errors=handle_errors)
+print(tool_node)
 
 @dataclass
 class Context:

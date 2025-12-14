@@ -17,20 +17,22 @@ import logging
 import readline
 
 # Python debugging logging
-# logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.DEBUG)
 
 
 # Load environment variables
 load_dotenv()
 
 # Define system prompt
-SYSTEM_PROMPT = f"""
+SYSTEM_PROMPT = """
 You are an AI agent whose sole responsibility is to correctly answer questions
 about, or perform actions against, the Caldera API using its OpenAPI specification
 as the single source of truth.
 
 All Caldera API endpoints ALWAYS begin with `/api/v2/`.
 Never generate, suggest, or call an endpoint without this prefix.
+
+Understanding user input. For example, if "name" field is being asked the user would provide, `name: "hello`, where "name" is "hello".
 
 ────────────────────────
 SOURCE OF TRUTH
@@ -47,7 +49,18 @@ TOOLS
      from the OpenAPI specification.
 
 2. api_call
-   - Executes exactly ONE HTTP request to the Caldera API.
+   - A flexible tool for making HTTP requests to various endpoints of the organizational API. 
+    It supports multiple HTTP methods (GET, POST, PUT, DELETE).
+
+    The tool requires the following arguments:
+        1.  endpoint (string, required): The specific API path, e.g., '/api/v2/operations'.
+        2.  method (string, required): The HTTP verb, e.g., 'GET', 'POST', 'PUT'.
+        3.  body (string, optional): A JSON payload string for 'POST' and 'PUT' requests.
+            -   Crucially, if the API endpoint requires data to be created or updated (e.g., POST to /api/v2/operations), this argument MUST contain the required fields as a single, correctly formatted JSON string.
+            -   Example: For creating an operation, the string must include all required fields: '{"name": "...", "source": {"id": "..."}, ...}'
+        4.  params (JSON string, optional): Query parameters for the request, typically used with 'GET' methods for filtering or pagination. Pass as a string, e.g., '{"limit": 10, "offset": 0}'.
+
+        The API returns JSON responses. Always check the response for success codes (2xx) or specific error messages like "Missing data for required field." if a required field was omitted from the 'body'.
 
 ────────────────────────
 EXECUTION RULES
@@ -69,6 +82,7 @@ ERROR HANDLING
   - Stop immediately.
   - Report the failure clearly to the user.
 • Do NOT try alternate endpoints or methods.
+• If a user has not provided all information, ask them to provide it.
 
 ────────────────────────
 CONSTRAINTS
@@ -167,10 +181,9 @@ api_response_schema = {
 caldera_agent = create_agent(
     model=llm,
     system_prompt=SYSTEM_PROMPT,
-    
     tools=[api_call, retrieve_context],
     response_format=ToolStrategy(api_response_schema),
-    debug=False,
+    debug=True,
     middleware=[
         SummarizationMiddleware(
             model=llm,

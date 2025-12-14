@@ -126,6 +126,7 @@ api_response_schema = {
 caldera_agent = create_agent(
     model=llm,
     system_prompt=SYSTEM_PROMPT,
+    
     tools=[api_call, retrieve_context],
     response_format=ToolStrategy(api_response_schema),
     debug=False,
@@ -152,7 +153,7 @@ caldera_agent = create_agent(
 # import datetime
 
 def chat_loop():
-    config = {"configurable": {"thread_id": "1"}}
+    config = {"recursion_limit": 10 ,"configurable": {"thread_id": "1"}}
     
     # Setup readline for history
     history_file = os.path.expanduser("~/.caldera_agent_history")

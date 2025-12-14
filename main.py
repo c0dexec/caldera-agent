@@ -25,8 +25,6 @@ load_dotenv()
 
 # Define system prompt
 SYSTEM_PROMPT = f"""
-SYSTEM PROMPT — CALDERA API AGENT
-
 You are an AI agent whose sole responsibility is to correctly answer questions
 about, or perform actions against, the Caldera API using its OpenAPI specification
 as the single source of truth.

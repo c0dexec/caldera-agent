@@ -7,7 +7,7 @@
     - `GOOGLE_API_KEY`
     - `CALDERA_API_TOKEN`
     - `CALDERA_WEB_URL`
-- A subscription to an AI agent would be required, preferably Gemini as the code was tested on (Gemini 2.5 Flash-Lite)[https://docs.cloud.google.com/vertex-ai/generative-ai/docs/models/gemini/2-5-flash-lite].
+- A subscription to an AI agent would be required, preferably Gemini as the code was tested on [Gemini 2.5 Flash-Lite](https://docs.cloud.google.com/vertex-ai/generative-ai/docs/models/gemini/2-5-flash-lite).
 
 ## Work plan
 - [x] Implement OpenAPI v2 ingestion and suppliment it as context.
